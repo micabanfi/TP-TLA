@@ -20,6 +20,7 @@ extern int yylineno;
 %token<node> STRING_T
 
 %token EQUALS
+%token NOT
 %token EQUALSCMP
 %token DIFFCMP
 %token GT
@@ -123,4 +124,41 @@ statement	:END_LINE
 					add_terminal_node($$, endline_);
 				}
 			;
-			
+expression	:operand comparator operand			
+				{
+					$$ = new_tree();
+					$$->token = $2->token;
+					add_node($$, $1);
+					add_node($$, $2);
+					add_node($$, $3);
+				}
+			|NOT expression
+				{
+					$$ = new_tree();
+					add_terminal_node($$, not_);
+					add_node($$, $2);
+				}
+			|expression AND expression
+				{
+					$$ = new_tree();
+					add_node($$, $1);
+					add_terminal_node($$, and_);
+					add_node($$, $3);
+				}
+			|expression OR expression
+				{
+					$$ = new_tree();
+					add_node($$, $1);
+					add_terminal_node($$, or_);
+					add_node($$, $3);
+				}
+			|TRUE
+				{
+					$$ = new_tree();
+					add_terminal_node($$, true_);
+				}
+			|FALSE
+				{
+					$$ = new_tree();
+					add_terminal_node($$, false_);
+				}
