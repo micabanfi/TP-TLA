@@ -16,9 +16,10 @@ linea			\n
 
 %%
 "es"			{return EQUALS;}
+"no es"			{return NOT};
 "es igual a"		{return EQUALSCMP;}
-"es distinto"		{return DIFFCMP; }
-"es mayor a"		{return GT;}
+"es distinto"		{return NTEQUAL; }
+"es mayor a"	 	{return GT;}
 "es menor a"		{return LT;}
 "es mayor o igual a"	{return GET;}
 "es menor o igual a"	{return LET;}
