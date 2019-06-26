@@ -49,7 +49,78 @@ extern int yylineno;
 
 %start PROGRAM
 
+%%
+program 	: statement
+			{
+				root = $1;
+				print_program(root);
+			}
+		;
+
+statement 	: statement statement
+				{
+					$$ = new_tree();
+					add_node($$, $1);
+					add_node($$, $2);
+				}
+			;
+
+statement	:END_LINE
+			{
+				$$ = new_tree();
+				add_terminal_node($$, endline_);
+			}
+
+			| IF expression statement
+				{
+					$$ = new_tree();
+					add_terminal_node($$, if_);
+					add_node($$, $3);
+					add_node($$, $4);
+				}
+			|IF expression statement ELSE statement
+				{
+					$$ = new_tree();
+					add_terminal_node($$, if_);
+					add_node($$, $3);
+					add_node($$, $4);
+					add_terminal_node($$, else_);
+					add_node($$, $6);
 
 
-
-
+				}
+			| WHILE expression statement
+				{
+					$$ = new_tree();
+					add_terminal_node($$, while_);
+					add_node($$, $3);
+					add_node($$, $4);
+				}
+			|DO statement WHILE expression
+				{
+					$$ = new_tree();
+					add_terminal_node($$, do_);
+					add_node($$, $3);
+					add_terminal_node($$, while_);
+					add_node($$, $5);
+				}
+			|definition END_LINE
+				{
+					$$ = new_tree();
+					add_node($$, $1);
+					add_terminal_node($$, endline_);
+				}
+			|assignment END_LINE
+				{
+					$$ = new_tree();
+					add_node($$, $1);
+					add_terminal_node($$, endline_);
+				}
+			| print END_LINE
+				{
+					$$ = new_tree();
+					add_node($$, $1);
+					add_terminal_node($$, endline_);
+				}
+			;
+			
