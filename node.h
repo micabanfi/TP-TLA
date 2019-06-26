@@ -3,8 +3,12 @@
 
 
 typedef struct Node {
-	int type;
+	struct Node **child;
+	token t;
 	char* string;
+	int index;
+	
+	
 }Node;
 
 
