@@ -51,14 +51,14 @@ extern int yylineno;
 %start PROGRAM
 
 %%
-program 	: statement
+program 		: statement
 			{
 				root = $1;
 				print_program(root);
 			}
-		;
+			;
 
-statement 	: statement statement
+statement 		: statement statement
 				{
 					$$ = new_tree();
 					add_node($$, $1);
@@ -66,7 +66,7 @@ statement 	: statement statement
 				}
 			;
 
-statement	:END_LINE
+statement		:END_LINE
 			{
 				$$ = new_tree();
 				add_terminal_node($$, endline_);
@@ -124,7 +124,7 @@ statement	:END_LINE
 					add_terminal_node($$, endline_);
 				}
 			;
-expression	:operand comparator operand			
+expression		:operand comparator operand			
 				{
 					$$ = new_tree();
 					$$->token = $2->token;
@@ -162,3 +162,119 @@ expression	:operand comparator operand
 					$$ = new_tree();
 					add_terminal_node($$, false_);
 				}
+			;
+comparator	:EQUALSCMP
+				{
+					$$ = new_tree();
+					add_terminal_node($$, equalscmp_);
+					$$->token = equalscmp_;
+				}
+			|NTEQUAL
+				{
+					$$ = new_tree();
+					add_terminal_node($$, ntequal_);
+					$$->token =  ntequal_;
+				}
+			|GT
+				{
+					$$ = new_tree();
+					add_terminal_node($$, gt_);
+				}
+			|LT
+				{
+					$$ = new_tree();
+					add_terminal_node($$, lt_);
+				}
+			|GET
+				{
+					$$ = new_tree();
+					add_terminal_node($$, get_);
+				}
+			|LET
+				{
+					$$ = new_tree();
+					add_terminal_node($$, let_);
+				}
+
+	
+
+operand		:INT
+				{
+					$$ = new_tree();
+					// char * aux = malloc(33);
+					// sprintf(aux, "%d", $1);
+					add_terminal_node_with_value($$, int_, aux);
+				}	
+			|STRING
+				{
+					$$ = new_tree();
+					add_terminal_node_with_value($$, string_, $1);
+				}	
+			|operand operator operand
+				{
+					$$ = new_tree();
+					add_node($$, $1);
+					add_node($$, $2);
+					add_node($$, $3);
+					$$->token = $2->token;
+				}
+			;
+operator		:AND
+				{
+					$$ = new_tree();
+					add_terminal_node($$, and_);
+				}
+			|OR	
+				{
+					$$ = new_tree();
+					add_terminal_node($$, or_);
+				}
+			|PLUS
+				{
+					$$ = new_tree();
+					add_terminal_node($$, plus_);
+				}
+			|MINUS
+				{
+					$$ = new_tree();
+					add_terminal_node($$, minus_);
+				}
+			|MULT
+				{
+					$$ = new_tree();
+					add_terminal_node($$, mult_);
+				}
+			|DIV
+				{
+					$$ = new_tree();
+					add_terminal_node($$, div_);
+				}		
+			|MOD
+				{
+					$$ = new_tree();
+					add_terminal_node($$, mod_);
+				}
+
+arguments		:expression
+				{
+					$$ = new_tree();
+					add_node($$, $1);
+				}
+			|operand
+				{
+					$$ = new_tree();
+					add_node($$, $1);
+				}
+			;
+
+
+print 		: PRINT arguments
+				{
+					$$ = new_tree();
+					add_terminal_node($$, print_);
+					add_node($$, $2);
+					$$->token = print_;
+				}
+			;			
+%%
+			
