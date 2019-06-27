@@ -9,15 +9,14 @@ extern char* yytext;
 extern int yylineno;
 %}
 
-%define parse.lac full
-%define parse.error verbose
+// %define parse.lac full
+// %define parse.error verbose
 
 %union{
 	Node *node;
 }
 
-%token<node> INT_T
-%token<node> STRING_T
+
 
 %token EQUALS
 %token NOT
@@ -40,13 +39,19 @@ extern int yylineno;
 %token<node> ELSE
 %token<node> DO
 %token<node> WHILE
-%token<node> END_LINE
+%token<node> END_LINE FALSE TRUE 
+%token<node> INT_T
+%token<node> STRING_T
+%token<string> STRING
+%token<integer> INT
+%type<node> statement expression comparator operand operator 
+%type<node> arguments definition assignment print
 
-%right EQUALS
-%left EQUALS NTEQUAL
+%right EQUALS GT GET LT LET 
+%left  EQUALSCMP NTEQUAL
 %left PLUS MINUS MUL DIV MOD
 %left OR AND NOT 
-%left GT GET LT LET 
+ 
 
 %start PROGRAM
 
@@ -266,7 +271,26 @@ arguments		:expression
 					add_node($$, $1);
 				}
 			;
-
+definition 		: INT_T assignment
+				{
+					$$ = new_tree();
+					add_terminal_node($$, int_t_);
+					add_node($$, $2);
+				}
+			| STRING_T assignment
+				{
+					$$ = new_tree();
+					add_terminal_node($$, string_t_);
+					add_node($$, $2);
+				}
+			;			
+assignment		:ID EQUALS operator
+				{
+					$$ = new_tree();
+					add_terminal_node_with_value($$, id_, $1);
+					add_terminal_node($$, equals_);
+					add_node($$, $3);
+				}
 
 print 		: PRINT arguments
 				{
@@ -277,4 +301,10 @@ print 		: PRINT arguments
 				}
 			;			
 %%
-			
+
+int main(){
+
+  yyparse();
+  printf("No Errors!!\n");
+  return 0;
+}			
