@@ -15,6 +15,8 @@ numero			{digito}+
 linea			\n
 
 %%
+"INICIO"		{return MAIN;}
+"FIN"			{return END;}
 "es"			{return EQUALS;}
 "no es"			{return NOT};
 "es igual a"		{return EQUALSCMP;}
@@ -39,21 +41,16 @@ linea			\n
 "texto"			{return STRING_T;}
 "numero"		{return INT_T;}
 "imprimir"		{return PRINT;}
-"."			{return END_LINE;}	
+"\n"			{return END_LINE;}	
 "("			{return L_PAR;}
 ")"			{return R_PAR;}
 
 {numero} 		{yylval.integer = strtol(yytext, NULL, 10);
 					return INT;}
 
-{texto}			{char * texto = malloc(strlen(yytext)+1);
-				strcpy(texto, yytext);
-				yylval.string = texto;
-				return ID;
-			}
-
-{linea}			{yylineno++;}
-
+\"(\\.|[^"\\])*\"				{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
+									strcpy(str, yytext);
+									yylval.node = newNode(TYPE_TEXT,str); return TEXT_C;}
 %%		
 
 //when the end of input file is read. Return 1 to signal end of input
