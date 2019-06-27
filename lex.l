@@ -68,7 +68,7 @@ void yyerror(char *s){
 
 //in case the token doesnt envoke yyerror
 void invalidToken(){
-	printf("\nERROR ON line %d : \n Invalid Token %s\n",yylineno,yytext);
+	printf("\nERROR ON line  : \n Invalid Token \n");
 	exit(0);
 }
 

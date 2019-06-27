@@ -16,7 +16,7 @@ static Node * root;
 // %define parse.error verbose
 
 %union{
-	struct Node_t * node;
+	struct Node * node;
 
 }
 
@@ -65,7 +65,6 @@ static Node * root;
 program 		: statement
 			{
 				root = $1;
-				print_program(root);
 			}
 			;
 
@@ -138,7 +137,7 @@ statement		:END_LINE
 expression		:operand comparator operand			
 				{
 					$$ = new_tree();
-					$$->token = $2->token;
+					//$$->token = $2.token;
 					add_node($$, $1);
 					add_node($$, $2);
 					add_node($$, $3);
@@ -178,7 +177,7 @@ comparator	:EQUALSCMP
 				{
 					$$ = new_tree();
 					add_terminal_node($$, "==");
-					$$->token = "==";
+					$$->token = "=";
 				}
 			|NTEQUAL
 				{
@@ -209,19 +208,8 @@ comparator	:EQUALSCMP
 
 	
 
-operand			:INT
-				{
-					$$ = new_tree();
-					// char * aux = malloc(33);
-					// sprintf(aux, "%d", $1);
-					add_terminal_node_with_value($$, "Integer", aux);
-				}	
-			|STRING
-				{
-					$$ = new_tree();
-					add_terminal_node_with_value($$, "String", $1);
-				}	
-			|operand operator operand
+operand				
+			:operand operator operand
 				{
 					$$ = new_tree();
 					add_node($$, $1);

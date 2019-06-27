@@ -1,9 +1,8 @@
-//ver link de donde lo sacamos
 #include <stdio.h>
 #include <stdlib.h>
 #include "node.h"
 
-Node* newNode(string t, char* string)
+Node* newNode(char* t, char* string)
 {
 	Node* node = malloc(sizeof(Node));
 	node->token = t;
@@ -15,25 +14,25 @@ Node* newNode(string t, char* string)
 
 void
 add_node(Node * p, Node * c){
-	p->children[p->index++] = c;
+	p->child[p->index++] = c;
 }
 
 Node *
 new_tree(){
-	return new_node(root_, NULL);
+	return newNode("", NULL);
 }
 
 void
-add_terminal_node(Node * p, string t){
+add_terminal_node(Node * p, char* t){
 	if(p == NULL)
 		return;
 
-	p->child[p->index++] = new_node(t, NULL);
+	p->child[p->index++] = newNode(t, NULL);
 }
 
 void
 set_string(Node * n, char * new_string){
-	n->sting = new_string;
+	n->string = new_string;
 }
 
 char *
@@ -42,11 +41,11 @@ get_string(Node * n){
 }
 
 void
-add_terminal_node_with_value(Node * p, string t, char * string) {
+add_terminal_node_with_value(Node * p, char* t, char * string) {
 
 	if(p == NULL)
 		return;
 
-	p->child[p->index++] = new_node(t, string);
+	p->child[p->index++] = newNode(t, string);
 
 }
