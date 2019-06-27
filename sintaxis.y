@@ -16,7 +16,8 @@ static Node * root;
 // %define parse.error verbose
 
 %union{
-	Node *node;
+	struct Node_t * node;
+
 }
 
 

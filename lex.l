@@ -16,7 +16,7 @@ linea			\n
 
 %%
 "es"			{return EQUALS;}
-"no es"			{return NOT};
+"no es"			{return NOT;}
 "es igual a"		{return EQUALSCMP;}
 "es distinto"		{return NTEQUAL; }
 "es mayor a"	 	{return GT;}
@@ -43,16 +43,15 @@ linea			\n
 "("			{return L_PAR;}
 ")"			{return R_PAR;}
 
-{numero} 		{yylval.integer = strtol(yytext, NULL, 10);
+{numero} 		{yylval.node = strtol(yytext, NULL, 10);
 					return INT;}
 
 {texto}			{char * texto = malloc(strlen(yytext)+1);
 				strcpy(texto, yytext);
-				yylval.string = texto;
+				yylval.node = texto;
 				return ID;
 			}
 
-{linea}			{yylineno++;}
 
 %%		
 
@@ -63,7 +62,7 @@ int yywrap(void){
 
 //invalid token or secual is encounter
 void yyerror(char *s){
-	fprintf(stderr, "\nERROR ON line %d : \n %s\n",yylineno,s);
+	fprintf(stderr, "\nERROR ON line\n");
 	exit(0);
 }
 
