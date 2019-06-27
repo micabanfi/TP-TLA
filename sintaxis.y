@@ -1,12 +1,15 @@
 %{
 #include <stdio.h>
 #include <string.h>
-#include <node.h>
+#include "node.h"
 
 extern void yyerror();
 extern int yylex();
 extern char* yytext;
 extern int yylineno;
+static Node * root;
+
+
 %}
 
 // %define parse.lac full
@@ -44,8 +47,10 @@ extern int yylineno;
 %token<node> STRING_T
 %token<string> STRING
 %token<integer> INT
+%token<node> ID
 %type<node> statement expression comparator operand operator 
 %type<node> arguments definition assignment print
+%type<node> program
 
 %right EQUALS GT GET LT LET 
 %left  EQUALSCMP NTEQUAL
@@ -53,7 +58,7 @@ extern int yylineno;
 %left OR AND NOT 
  
 
-%start PROGRAM
+%start program
 
 %%
 program 		: statement
@@ -74,23 +79,23 @@ statement 		: statement statement
 statement		:END_LINE
 			{
 				$$ = new_tree();
-				add_terminal_node($$, endline_);
+				add_terminal_node($$, "\n");
 			}
 
 			| IF expression statement
 				{
 					$$ = new_tree();
-					add_terminal_node($$, if_);
+					add_terminal_node($$, "if");
 					add_node($$, $2);
 					add_node($$, $3);
 				}
 			|IF expression statement ELSE statement
 				{
 					$$ = new_tree();
-					add_terminal_node($$, if_);
+					add_terminal_node($$, "if");
 					add_node($$, $2);
 					add_node($$, $3);
-					add_terminal_node($$, else_);
+					add_terminal_node($$, "else");
 					add_node($$, $5);
 
 
@@ -98,35 +103,35 @@ statement		:END_LINE
 			| WHILE expression statement
 				{
 					$$ = new_tree();
-					add_terminal_node($$, while_);
+					add_terminal_node($$, "while");
 					add_node($$, $2);
 					add_node($$, $3);
 				}
 			|DO statement WHILE expression
 				{
 					$$ = new_tree();
-					add_terminal_node($$, do_);
+					add_terminal_node($$, "do");
 					add_node($$, $2);
-					add_terminal_node($$, while_);
+					add_terminal_node($$, "while");
 					add_node($$, $4);
 				}
 			|definition END_LINE
 				{
 					$$ = new_tree();
 					add_node($$, $1);
-					add_terminal_node($$, endline_);
+					add_terminal_node($$, "\n");
 				}
 			|assignment END_LINE
 				{
 					$$ = new_tree();
 					add_node($$, $1);
-					add_terminal_node($$, endline_);
+					add_terminal_node($$, "\n");
 				}
 			| print END_LINE
 				{
 					$$ = new_tree();
 					add_node($$, $1);
-					add_terminal_node($$, endline_);
+					add_terminal_node($$, "\n");
 				}
 			;
 expression		:operand comparator operand			
@@ -140,80 +145,80 @@ expression		:operand comparator operand
 			|NOT expression
 				{
 					$$ = new_tree();
-					add_terminal_node($$, not_);
+					add_terminal_node($$, "!");
 					add_node($$, $2);
 				}
 			|expression AND expression
 				{
 					$$ = new_tree();
 					add_node($$, $1);
-					add_terminal_node($$, and_);
+					add_terminal_node($$, "&&");
 					add_node($$, $3);
 				}
 			|expression OR expression
 				{
 					$$ = new_tree();
 					add_node($$, $1);
-					add_terminal_node($$, or_);
+					add_terminal_node($$, "||");
 					add_node($$, $3);
 				}
 			|TRUE
 				{
 					$$ = new_tree();
-					add_terminal_node($$, true_);
+					add_terminal_node($$, "TRUE");
 				}
 			|FALSE
 				{
 					$$ = new_tree();
-					add_terminal_node($$, false_);
+					add_terminal_node($$, "FALSE");
 				}
 			;
 comparator	:EQUALSCMP
 				{
 					$$ = new_tree();
-					add_terminal_node($$, equalscmp_);
-					$$->token = equalscmp_;
+					add_terminal_node($$, "==");
+					$$->token = "==";
 				}
 			|NTEQUAL
 				{
 					$$ = new_tree();
-					add_terminal_node($$, ntequal_);
-					$$->token =  ntequal_;
+					add_terminal_node($$, "!=");
+					$$->token =  "!=";
 				}
 			|GT
 				{
 					$$ = new_tree();
-					add_terminal_node($$, gt_);
+					add_terminal_node($$, ">");
 				}
 			|LT
 				{
 					$$ = new_tree();
-					add_terminal_node($$, lt_);
+					add_terminal_node($$, "<");
 				}
 			|GET
 				{
 					$$ = new_tree();
-					add_terminal_node($$, get_);
+					add_terminal_node($$, ">=");
 				}
 			|LET
 				{
 					$$ = new_tree();
-					add_terminal_node($$, let_);
+					add_terminal_node($$, "<=");
 				}
 
 	
 
-operand		:INT
+operand			:INT
 				{
 					$$ = new_tree();
 					// char * aux = malloc(33);
 					// sprintf(aux, "%d", $1);
-					add_terminal_node_with_value($$, int_, aux);
+					add_terminal_node_with_value($$, "Integer", aux);
 				}	
 			|STRING
 				{
 					$$ = new_tree();
-					add_terminal_node_with_value($$, string_, $1);
+					add_terminal_node_with_value($$, "String", $1);
 				}	
 			|operand operator operand
 				{
@@ -223,41 +228,46 @@ operand		:INT
 					add_node($$, $3);
 					$$->token = $2->token;
 				}
+			|ID
+				{
+				$$ = new_tree();
+					add_terminal_node_with_value($$, "ID", $1);
+				}
 			;
 operator		:AND
 				{
 					$$ = new_tree();
-					add_terminal_node($$, and_);
+					add_terminal_node($$, "&&");
 				}
 			|OR	
 				{
 					$$ = new_tree();
-					add_terminal_node($$, or_);
+					add_terminal_node($$, "||");
 				}
 			|PLUS
 				{
 					$$ = new_tree();
-					add_terminal_node($$, plus_);
+					add_terminal_node($$, "+");
 				}
 			|MINUS
 				{
 					$$ = new_tree();
-					add_terminal_node($$, minus_);
+					add_terminal_node($$, "-");
 				}
 			|MULT
 				{
 					$$ = new_tree();
-					add_terminal_node($$, mult_);
+					add_terminal_node($$, "*");
 				}
 			|DIV
 				{
 					$$ = new_tree();
-					add_terminal_node($$, div_);
+					add_terminal_node($$, "/");
 				}		
 			|MOD
 				{
 					$$ = new_tree();
-					add_terminal_node($$, mod_);
+					add_terminal_node($$, "%");
 				}
 
 arguments		:expression
@@ -274,30 +284,30 @@ arguments		:expression
 definition 		: INT_T assignment
 				{
 					$$ = new_tree();
-					add_terminal_node($$, int_t_);
+					add_terminal_node($$, "Integer");
 					add_node($$, $2);
 				}
 			| STRING_T assignment
 				{
 					$$ = new_tree();
-					add_terminal_node($$, string_t_);
+					add_terminal_node($$, "String");
 					add_node($$, $2);
 				}
 			;			
 assignment		:ID EQUALS operator
 				{
 					$$ = new_tree();
-					add_terminal_node_with_value($$, id_, $1);
-					add_terminal_node($$, equals_);
+					add_terminal_node_with_value($$, "ID", $1);
+					add_terminal_node($$, "=");
 					add_node($$, $3);
 				}
 
 print 		: PRINT arguments
 				{
 					$$ = new_tree();
-					add_terminal_node($$, print_);
+					add_terminal_node($$, "printf");
 					add_node($$, $2);
-					$$->token = print_;
+					$$->token = "printf";
 				}
 			;			
 %%

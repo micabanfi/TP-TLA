@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "node.h"
 
-Node* newNode(token t, char* string)
+Node* newNode(string t, char* string)
 {
 	Node* node = malloc(sizeof(Node));
 	node->token = t;
@@ -24,7 +24,7 @@ new_tree(){
 }
 
 void
-add_terminal_node(Node * p, token t){
+add_terminal_node(Node * p, string t){
 	if(p == NULL)
 		return;
 
@@ -42,7 +42,7 @@ get_string(Node * n){
 }
 
 void
-add_terminal_node_with_value(Node * p, token t, char * string) {
+add_terminal_node_with_value(Node * p, string t, char * string) {
 
 	if(p == NULL)
 		return;
