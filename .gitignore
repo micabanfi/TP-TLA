@@ -1,4 +1,14 @@
 ### C ###
+# Specific
+compiler
+lex.yy.c
+makefile
+y.tab.c
+y.tab.h
+
+
+
+
 # Prerequisites
 *.d
 
