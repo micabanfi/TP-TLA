@@ -171,29 +171,25 @@ int main(){
   // return 0;
 }		
 
-char* strcatN(int num, ...){
-	if(num<=1){
+char* strcatN(int count, ...){
+	if(count<=1){
 		return NULL;
 	}
-	int i, length;
-	char* toAdd;
+	char* next;
 	char* ret;
-
+	int length = 0;
+	
 	va_list strings;
-	va_start(strings, num);
-	toAdd = va_arg(strings, char*);
-
-	length = 0;
-	length = strlen(toAdd)+ 1;
-
-	ret = (char*)malloc(sizeof(char) * length);
-	strcpy(ret, toAdd);
-	for(i = 1; i < num ; i++)
-	{
-		toAdd = va_arg(strings, char*);
-		length += strlen(toAdd);
-		ret = (char*)realloc((void*)ret, length * sizeof(char));
-		strcat(ret, toAdd);
+	va_start(strings, count);
+	next = va_arg(strings, char*);
+	length = strlen(next)+ 1;
+	ret = (char*)malloc(length);
+	strcpy(ret, next);
+	for(int i = 1; i < count ; i++){
+		next = va_arg(strings, char*);
+		length += strlen(next);
+		ret = (char*)realloc((void*)ret, length);
+		strcat(ret, next);
 	}
 	va_end(strings);
 	return ret;
