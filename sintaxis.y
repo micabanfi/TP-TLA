@@ -1,17 +1,24 @@
 %{
-#include <stdio.h>
-#include <string.h>
-#include "node.h"
-#include "sintaxis.tab.h"
-
-extern void yyerror();
-extern int yylex();
-extern char* yytext;
-extern int yylineno;
-static Node * root;
-char* strcatN(int num, ...);
-#define TYPE_NUMBER 1
-#define TYPE_TEXT 2
+	#include "node.h"
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <stdarg.h>
+	#include <string.h>
+	
+	#define MAX_SYMBOLS 100
+	#define MAX_SYMBOL_LENGTH 100
+	#define TYPE_NOTFOUND 0
+	#define TYPE_NUMBER 1
+	#define TYPE_TEXT 2
+	extern int yylex();
+	extern int linenum;
+	char symbolsTable[MAX_SYMBOL_LENGTH][MAX_SYMBOLS];
+	int symbols = 0, symbolsType[MAX_SYMBOLS];
+	void yyerror(const char * s);
+	char* strcatN(int num, ...);
+	void insertSymbol(char * symbol, int symbolType);
+	int getType(char * symbol);
+	void checkType(int t1, int t2);
 
 %}
 
@@ -29,7 +36,7 @@ char* strcatN(int num, ...);
 %token END
 %token PRINT
 %token texto
-%token TEXT_C
+%token<node> TEXT_C
 %type<node> program
 %type<node> statement
 %type<node> PRINT_F
@@ -57,7 +64,8 @@ statement 	: MAIN PRINT_F END{
 			};
 
 PRINT_F 	: PRINT EXPRESSION{
-			$$ = newNode(TYPE_TEXT, strcatN(3, "printf(\"%s\"", $2->string , ");\n" );
+			if($2->type == TYPE_TEXT)
+				$$ = newNode(TYPE_TEXT, strcatN(3, "printf(\"%s\"", $2->string , ");\n" );
 			};		
 
 EXPRESSION	: TERM  {$$ = $1;};	
