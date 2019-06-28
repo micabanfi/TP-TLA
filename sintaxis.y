@@ -120,12 +120,12 @@ ELIF        : OR IF CONDITIONAL END_LINE CODE ENDIF END_LINE {$$ = newNode(TYPE_
 			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $5->string));};
 			| ELSE END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(3, " else {", $2->string, "}\n"));};
 			
-CONDITIONAL : NUM_C EQUALS NUM_C 	{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $1->string, ")"));};
-			| NUM_C DIF NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $1->string, ")"));};
-			| NUM_C GT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $1->string, ")"));};
-			| NUM_C GET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $1->string, ")"));};
-			| NUM_C LT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $1->string, ")"));};
-			| NUM_C LET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $1->string, ")"));};
+CONDITIONAL : NUM_C EQUALS NUM_C 	{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
+			| NUM_C DIF NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
+			| NUM_C GT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
+			| NUM_C GET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
+			| NUM_C LT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
+			| NUM_C LET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
 			| OP CONDITIONAL OR CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " || ", $4->string, ")"));};
 			| OP CONDITIONAL AND CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " && ", $4->string, ")"));};
 
