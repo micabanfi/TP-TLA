@@ -26,8 +26,8 @@ numero			{digito}+
 linea			\n
 
 %%
-"INICIO"		{return MAIN;}
-"FIN"			{return END;}
+"inicio"		{return MAIN;}
+"fin"		{return END;}
 
 \"(\\.|[^"\\])*\"				{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
 									strcpy(str, yytext);
