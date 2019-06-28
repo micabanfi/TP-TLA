@@ -8,7 +8,7 @@ typedef struct Node {
 }Node;
 
 
-Node* newNode(char* type, char* string);
+Node* newNode(int type, char* string);
 void add_node(Node * p, Node * c);
 Node * new_tree();
 void add_terminal_node(Node * p, char* t);

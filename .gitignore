@@ -2,7 +2,7 @@
 # Specific
 compiler
 lex.yy.c
-makefile
+# makefile
 y.tab.c
 y.tab.h
 
