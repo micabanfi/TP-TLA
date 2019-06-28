@@ -35,6 +35,11 @@
 // Finales
 %token print
 %token texto
+%token EQUALS
+%token PLUS
+%token MINUS
+%token MULT
+%token DIV
 
 // Finales variables ?
 %token<node> NUMBER_T
@@ -42,6 +47,10 @@
 %token<node> MAIN
 %token<node> END
 %token<node> TEXT_C
+%token<node> NUM_C
+%token<node> ID
+%token<node> IF
+
 
 //No finales
 %type<node> PROGRAM
@@ -49,9 +58,14 @@
 %type<node> EXPRESSION
 %type<node> CODE
 %type<node> TERM
+%type<node> ASSIGNMENT
+%type<node> DEFINITION
+%type<node> DECLARATION
 
 
-%right EQUALS GT GET LT LET 
+
+%right EQUALS 
+%left GT GET LT LET 
 %left  EQUALSCMP NTEQUAL
 %left PLUS MINUS MUL DIV MOD
 %left OR AND NOT 
@@ -61,20 +75,58 @@
 
 %%
 PROGRAM 	: MAIN CODE END {printf("%s",strcatN(4,"#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <ctype.h>\n",
-	"int main(void){\n\t",$2->string,"\n}\n"));};
-CODE		: STATEMENT {$$ = $1;};
-STATEMENT 	: print TERM {
+			"int main(void){\n\t",$2->string,"\n}\n"));};
+
+CODE		: STATEMENT {$$ = $1;}
+			
+			
+STATEMENT 	: print EXPRESSION {
 				if($2->type == TYPE_TEXT){
 					$$ = newNode(TYPE_TEXT, strcatN(3, "printf(\"%s\",", $2->string , ");\n" ));
 				}else if($2->type == TYPE_NUMBER){
 					$$ = newNode(TYPE_NUMBER, strcatN(3, "printf(\"%d\",", $2->string , ");\n" ));	
-				};
-			};
-			| {$$ = newNode(TYPE_TEXT, ";");}; //Working
+				}
+				}
+			| {$$ = newNode(TYPE_TEXT, ";");} //Working
+			| DECLARATION {$$ = newNode(TYPE_TEXT, $1->string);}
+			| ASSIGNMENT {$$ = newNode(TYPE_TEXT, $1->string);}
+			| DEFINITION {$$ = newNode(TYPE_TEXT, $1->string);};
 
-EXPRESSION	: TERM  {$$ = $1;};	
 
-TERM		: TEXT_C {$$ = $1;}; | NUMBER_T {$$ = $1;};
+EXPRESSION	: TERM  {$$ = $1;}
+			|EXPRESSION PLUS EXPRESSION{
+									 if($1->type == TYPE_TEXT)
+									{
+										$$ = newNode(TYPE_TEXT, strcatN(5,"strcatP(",$1->string,",",$3->string,")"));
+									}
+									else
+										$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")+(",$3->string,")"));
+									}
+			| EXPRESSION MINUS EXPRESSION {
+									$$ = newNode(TYPE_NUMBER,strcatN(5,"(",$1->string,")-(",$3->string,")"));
+			}
+			|EXPRESSION MUL EXPRESSION {
+									$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")*(",$3->string,")"));
+
+			}
+			|EXPRESSION DIV EXPRESSION{
+									if($3->string ==0 ){
+											yyerror("Recuerde que no puede dividir por cero");
+									}
+									else{
+										$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")/(",$3->string,")"));
+									}
+			}
+
+TERM		: TEXT_C {$$ = newNode(TYPE_TEXT, $1->string);}
+			| NUM_C {$$ = newNode(TYPE_NUMBER, $1->string);}
+			| ID {$$ = newNode(getType($1->string),$1->string);};
+
+DECLARATION :NUMBER_T ID {$$ = newNode(TYPE_TEXT,strcatN(3,"int ",$2->string,";")); };
+ASSIGNMENT : ID EQUALS EXPRESSION {$$ = newNode($3->type,strcatN(4,$1->string,"=",$3->string,";"));};
+DEFINITION	: NUMBER_T ID EQUALS EXPRESSION { $$ = newNode(TYPE_TEXT,strcatN(5,"int ",$2->string,"=",$4->string,";")); }
+
+
 %%
 
 int main(){
@@ -108,4 +160,33 @@ char* strcatN(int num, ...)
 	}
 	va_end(strings);
 	return ret;
+}
+
+int getType(char * symbol) 
+{
+	int index;
+	for(index = 0; index < symbols; index++) {
+		if(strcmp(symbol, symbolsTable[index]) == 0) {
+			return symbolsType[index];
+		}
+	}
+
+	return TYPE_NOTFOUND;
+}
+
+void insertSymbol(char * symbol, int symbolType)
+{
+	int index;
+ 	for(index = 0; index < symbols; index++) {
+		if(strcmp(symbol, symbolsTable[index]) == 0) {
+			if(symbolsType[index] == symbolType)
+				yyerror("Redeclaration of variable");
+			else
+				yyerror("Multiple Declaration of Variable");
+		}
+	}
+
+	symbolsType[symbols] = symbolType;
+	strcpy(symbolsTable[symbols], symbol);
+	symbols++;
 }
