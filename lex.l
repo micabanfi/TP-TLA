@@ -39,6 +39,7 @@ espacio      	[ \t\r\v\f]
 "-"				{return MINUS;}
 "*"				{return MULT;}
 "/"				{return DIV;}
+"." 			{return END_LINE;}
 
 
 
