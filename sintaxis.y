@@ -9,6 +9,7 @@
 	#define TYPE_NOTFOUND 0
 	#define TYPE_NUMBER 1
 	#define TYPE_TEXT 2
+	#define TYPE_BOOL 3
 	
 	int yydebug=1; 
 	extern int yylex();
@@ -38,10 +39,17 @@
 %token print
 %token texto
 %token EQUALS
+%token GET
+%token LET
+%token LT
+%token GT
+%token DIF
 %token PLUS
 %token MINUS
 %token MULT
 %token DIV
+%token OP
+%token CP
 
 // Finales variables ?
 %token<node> NUMBER_T
@@ -52,6 +60,10 @@
 %token<node> NUM_C
 %token<node> ID
 %token<node> IF
+%token<node> ENDIF
+%token<node> OR
+%token<node> ELSE
+%token<node> AND
 %token<node> END_LINE
 
 
@@ -60,6 +72,8 @@
 %type<node> PROGRAM
 %type<node> STATEMENT
 %type<node> EXPRESSION
+%type<node> CONDITIONAL
+%type<node> ELIF
 %type<node> CODE
 %type<node> TERM
 %type<node> ASSIGNMENT
@@ -68,7 +82,7 @@
 
 
 
-%right EQUALS 
+%right EQUALS DIF
 %left GT GET LT LET 
 %left  EQUALSCMP NTEQUAL
 %left PLUS MINUS MUL DIV MOD
@@ -82,21 +96,35 @@ PROGRAM 	: MAIN CODE END {printf("%s",strcatN(4,"#include <stdio.h>\n#include <s
 							"int main(void){\n\t",$2->string,"\n}\n"));}
 			| MAIN END { printf("%s","int main(void){}"); };
 
-CODE		: STATEMENT END_LINE{$$ = newNode(TYPE_TEXT, strcatN(2, $1->string, "\n"));}
-			| STATEMENT END_LINE CODE {$$ = newNode(TYPE_TEXT, strcatN(3, $1->string, "\t", $3->string));};
+CODE		: STATEMENT {$$ = newNode(TYPE_TEXT, strcatN(2, $1->string, ""));}
+			| STATEMENT CODE {$$ = newNode(TYPE_TEXT, strcatN(3, $1->string, "\t", $2->string));};
 			
-STATEMENT 	: print EXPRESSION {
+STATEMENT 	: print EXPRESSION END_LINE {
 				if($2->type == TYPE_TEXT){
 					$$ = newNode(TYPE_TEXT, strcatN(3, "printf(\"%s\",", $2->string , ");\n" ));
 				}else if($2->type == TYPE_NUMBER){
 					$$ = newNode(TYPE_NUMBER, strcatN(3, "printf(\"%d\",", $2->string , ");\n" ));	
 				}
 				}
-			| {$$ = newNode(TYPE_TEXT, "");} //Working
-			| DECLARATION {$$ = newNode(TYPE_TEXT, $1->string);}
-			| ASSIGNMENT {$$ = newNode(TYPE_TEXT, $1->string);}
-			| DEFINITION {$$ = newNode(TYPE_TEXT, $1->string);};
+			| END_LINE {$$ = newNode(TYPE_TEXT, "\n");} //Working
+			| DECLARATION END_LINE {$$ = newNode(TYPE_TEXT, $1->string);}
+			| ASSIGNMENT END_LINE {$$ = newNode(TYPE_TEXT, $1->string);}
+			| DEFINITION END_LINE {$$ = newNode(TYPE_TEXT, $1->string);};
+			| IF CONDITIONAL END_LINE CODE ELIF{$$ = newNode(TYPE_TEXT, strcatN(6, "if (",$2->string, "){\n", $4->string ,"\n}", $5->string));};
+			| IF CONDITIONAL END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(5, "if (",$2->string, "){\n", $4->string ,"\n}\n"));};
 
+ELIF        : OR IF CONDITIONAL END_LINE CODE ENDIF END_LINE {$$ = newNode(TYPE_TEXT, strcatN(5, " else if ", $3->string, "{\n", $5->string ,"\n}\n"));};
+			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $5->string));};
+			| ELSE END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(3, " else {", $2->string, "}\n"));};
+			
+CONDITIONAL : NUM_C EQUALS NUM_C 	{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $1->string, ")"));};
+			| NUM_C DIF NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $1->string, ")"));};
+			| NUM_C GT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $1->string, ")"));};
+			| NUM_C GET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $1->string, ")"));};
+			| NUM_C LT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $1->string, ")"));};
+			| NUM_C LET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $1->string, ")"));};
+			| OP CONDITIONAL OR CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " || ", $4->string, ")"));};
+			| OP CONDITIONAL AND CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " && ", $4->string, ")"));};
 
 EXPRESSION	: TERM  {$$ = $1;}
 			|EXPRESSION PLUS EXPRESSION{

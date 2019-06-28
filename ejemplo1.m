@@ -1,3 +1,3 @@
 inicio
-imprimir "aa"
+imprimir 2
 fin
