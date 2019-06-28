@@ -128,6 +128,18 @@ CONDITIONAL : NUM_C EQUALS NUM_C 	{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->s
 			| NUM_C LET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
 			| OP CONDITIONAL OR CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " || ", $4->string, ")"));};
 			| OP CONDITIONAL AND CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " && ", $4->string, ")"));};
+			| ID EQUALS NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
+			| ID DIF NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
+			| ID GT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
+			| ID GET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
+			| ID LT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
+			| ID LET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
+			| ID EQUALS ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
+			| ID DIF ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
+			| ID GT ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
+			| ID GET ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
+			| ID LT ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
+			| ID LET ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
 
 EXPRESSION	: TERM  {$$ = $1;}
 			|EXPRESSION PLUS EXPRESSION{
