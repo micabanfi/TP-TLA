@@ -28,7 +28,8 @@
 // %define parse.error verbose
 
 %union{
-	Node *node;
+	struct Node * node;
+
 }
 
 // Finales

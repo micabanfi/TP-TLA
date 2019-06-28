@@ -28,7 +28,6 @@ numero			{digito}+
 linea			\n
 espacio      	[ \t\r\v\f]
 
-
 %%
 "inicio"		{return MAIN;}
 "fin"		{return END;}
@@ -56,6 +55,4 @@ espacio      	[ \t\r\v\f]
 int yywrap(void){
 	return 1;
 }
-
-
 
