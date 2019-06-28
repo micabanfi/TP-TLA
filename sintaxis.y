@@ -22,6 +22,8 @@
 	int getType(char * symbol);
 	void checkType(int t1, int t2);
 	void repeteadVariable(char * currentSymbol);
+	void errorType();
+	void sameType(int s1,int s2);
 %}
 
 // %define parse.lac full
@@ -139,11 +141,25 @@ TERM		: TEXT_C {$$ = newNode(TYPE_TEXT, $1->string);}
 			| NUM_C {$$ = newNode(TYPE_NUMBER, $1->string);}
 			| ID {$$ = newNode(getType($1->string),$1->string);};
 
-DECLARATION :NUMBER_T ID {$$ = newNode(TYPE_TEXT,strcatN(3,"int ",$2->string,";")); };
+DECLARATION : NUMBER_T ID {	
+				newSymbol($2->string,TYPE_NUMBER);
+				$$ = newNode(TYPE_TEXT,strcatN(3,"int ",$2->string,";")); }
+			| TEXT_T ID {	
+				newSymbol($2->string,TYPE_TEXT);
+				$$ = newNode(TYPE_TEXT,strcatN(3,"char * ",$2->string,";")); };
 
-ASSIGNMENT	: ID EQUALS EXPRESSION {$$ = newNode($3->type,strcatN(4,$1->string,"=",$3->string,";"));};
+ASSIGNMENT	: ID EQUALS EXPRESSION {
+				sameType(getType($1->string),$3->type);
+				$$ = newNode($3->type,strcatN(4,$1->string,"=",$3->string,";"));};
 
-DEFINITION	: NUMBER_T ID EQUALS EXPRESSION { $$ = newNode(TYPE_TEXT,strcatN(5,"int ",$2->string,"=",$4->string,";")); }
+DEFINITION	: NUMBER_T ID EQUALS EXPRESSION { 
+				newSymbol($2->string,TYPE_NUMBER);
+				sameType(TYPE_NUMBER,$4->type);
+				$$ = newNode(TYPE_TEXT,strcatN(5,"int ",$2->string,"=",$4->string,";")); }
+			| TEXT_T ID EQUALS EXPRESSION { 
+				newSymbol($2->string,TYPE_TEXT);
+				sameType(TYPE_TEXT,$4->type);
+				$$ = newNode(TYPE_TEXT,strcatN(5,"char * ",$2->string,"=",$4->string,";")); };
 
 
 %%
@@ -193,6 +209,11 @@ int getType(char * currentSymbol) {
 	return TYPE_NOTFOUND;
 }
 
+void sameType(int s1,int s2){
+	if(s1!=s2)
+		errorType();
+}
+
 void newSymbol(char * currentSymbol, int currentSymbolType){
 
 	if(getType(currentSymbol)!=TYPE_NOTFOUND){
@@ -208,7 +229,14 @@ void newSymbol(char * currentSymbol, int currentSymbolType){
 
 void repeteadVariable(char * currentSymbol){
 	char line[10];
-	sprintf(line, "%d", lines);
+	sprintf(line, "%d", lines-1);
 	char* ret = strcatN(4,"Redefincion de variable ",currentSymbol," en la linea ", line);
+	yyerror(ret);
+}
+
+void errorType(){
+	char line[10];
+	sprintf(line, "%d", lines-1);
+	char* ret = strcatN(2,"Tipos no coinciden en la linea ", line);
 	yyerror(ret);
 }

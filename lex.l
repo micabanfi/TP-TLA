@@ -30,6 +30,7 @@ espacio      	[ \t\r\v\f]
 "es"			{return EQUALS;}
 "si"			{return IF;}
 "numero"		{return NUMBER_T;}
+"texto"			{return TEXT_T;}
 "+"				{return PLUS;}
 "-"				{return MINUS;}
 "*"				{return MULT;}
@@ -42,17 +43,20 @@ espacio      	[ \t\r\v\f]
 
 {numero}						{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
 									strcpy(str, yytext);
-									yylval.node = newNode(TYPE_NUMBER,str); return NUM_C;}
+									yylval.node = newNode(TYPE_NUMBER,str); 
+									return NUM_C;}
 {espacio}						{;}
 
 
 \"(\\.|[^"\\])*\"				{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
 									strcpy(str, yytext);
-									yylval.node = newNode(TYPE_TEXT,str); return TEXT_C;}
+									yylval.node = newNode(TYPE_TEXT,str);
+									return TEXT_C;}
 
 {texto}		{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
 									strcpy(str, yytext);
-									yylval.node = newNode(TYPE_TEXT,str); return ID;}									
+									yylval.node = newNode(TYPE_TEXT,str); 
+									return ID;}									
 %%		
 
 //when the end of input file is read. Return 1 to signal end of input
