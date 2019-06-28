@@ -75,9 +75,11 @@
 
 %%
 PROGRAM 	: MAIN CODE END {printf("%s",strcatN(4,"#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <ctype.h>\n",
-			"int main(void){\n\t",$2->string,"\n}\n"));};
+							"int main(void){\n\t",$2->string,"\n}\n"));}
+			| MAIN END { printf("%s","int main(void);"); };
 
 CODE		: STATEMENT {$$ = $1;}
+			| STATEMENT CODE {$$ = $1;};
 			
 			
 STATEMENT 	: print EXPRESSION {
@@ -116,14 +118,16 @@ EXPRESSION	: TERM  {$$ = $1;}
 									else{
 										$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")/(",$3->string,")"));
 									}
-			}
+			};
 
 TERM		: TEXT_C {$$ = newNode(TYPE_TEXT, $1->string);}
 			| NUM_C {$$ = newNode(TYPE_NUMBER, $1->string);}
 			| ID {$$ = newNode(getType($1->string),$1->string);};
 
 DECLARATION :NUMBER_T ID {$$ = newNode(TYPE_TEXT,strcatN(3,"int ",$2->string,";")); };
-ASSIGNMENT : ID EQUALS EXPRESSION {$$ = newNode($3->type,strcatN(4,$1->string,"=",$3->string,";"));};
+
+ASSIGNMENT	: ID EQUALS EXPRESSION {$$ = newNode($3->type,strcatN(4,$1->string,"=",$3->string,";"));};
+
 DEFINITION	: NUMBER_T ID EQUALS EXPRESSION { $$ = newNode(TYPE_TEXT,strcatN(5,"int ",$2->string,"=",$4->string,";")); }
 
 
