@@ -50,6 +50,8 @@
 %token<node> NUM_C
 %token<node> ID
 %token<node> IF
+%token<node> END_LINE
+
 
 
 //No finales
@@ -78,9 +80,8 @@ PROGRAM 	: MAIN CODE END {printf("%s",strcatN(4,"#include <stdio.h>\n#include <s
 							"int main(void){\n\t",$2->string,"\n}\n"));}
 			| MAIN END { printf("%s","int main(void){}"); };
 
-CODE		: STATEMENT {$$ = $1;}
-			| STATEMENT CODE {$$ = $1;};
-			
+CODE		: STATEMENT END_LINE{$$ = newNode(TYPE_TEXT, strcatN(2, $1->string, "\n"));}
+			| STATEMENT END_LINE CODE {$$ = newNode(TYPE_TEXT, strcatN(3, $1->string, "\t", $3->string));};
 			
 STATEMENT 	: print EXPRESSION {
 				if($2->type == TYPE_TEXT){
@@ -105,20 +106,34 @@ EXPRESSION	: TERM  {$$ = $1;}
 										$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")+(",$3->string,")"));
 									}
 			| EXPRESSION MINUS EXPRESSION {
-									$$ = newNode(TYPE_NUMBER,strcatN(5,"(",$1->string,")-(",$3->string,")"));
-			}
-			|EXPRESSION MUL EXPRESSION {
-									$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")*(",$3->string,")"));
-
-			}
-			|EXPRESSION DIV EXPRESSION{
-									if($3->string ==0 ){
-											yyerror("Recuerde que no puede dividir por cero");
+									if($1->type == TYPE_TEXT || $3->type == TYPE_TEXT){
+										yyerror("Operacion Invalida - se requieren operandos del tipo numero.");
 									}
 									else{
-										$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")/(",$3->string,")"));
+										$$ = newNode(TYPE_NUMBER,strcatN(5,"(",$1->string,")-(",$3->string,")"));
 									}
-			};
+			}
+			|EXPRESSION MUL EXPRESSION {
+									if($1->type == TYPE_TEXT || $3->type == TYPE_TEXT){
+										yyerror("Operacion Invalida - se requieren operandos del tipo numero.");
+									}
+									else{
+										$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")*(",$3->string,")"));
+									}
+			}
+			|EXPRESSION DIV EXPRESSION{
+								if($1->type == TYPE_TEXT || $3->type == TYPE_TEXT){
+										yyerror("Operacion Invalida - se requieren operandos del tipo numero.");
+									}
+									else{								
+										if($3->string ==0 ){
+											yyerror("Recuerde que no puede dividir por cero");
+										}
+										else{
+											$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")/(",$3->string,")"));
+										}
+									}
+			}
 
 TERM		: TEXT_C {$$ = newNode(TYPE_TEXT, $1->string);}
 			| NUM_C {$$ = newNode(TYPE_NUMBER, $1->string);}
