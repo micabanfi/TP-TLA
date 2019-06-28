@@ -2,6 +2,7 @@
 	#include "node.h"
 	#include <stdio.h>
 	#include <stdlib.h>
+	#include <ctype.h> 
 	#include <stdarg.h>
 	#include <string.h>
 	
@@ -10,6 +11,7 @@
 	#define TYPE_NOTFOUND 0
 	#define TYPE_NUMBER 1
 	#define TYPE_TEXT 2
+	int yydebug=1; 
 	extern int yylex();
 	extern int linenum;
 	char symbolsTable[MAX_SYMBOL_LENGTH][MAX_SYMBOLS];
@@ -32,8 +34,8 @@
 
 %token<node> NUMBER_T
 %token<node> TEXT_T
-%token MAIN
-%token END
+%token<node> MAIN
+%token<node> END
 %token PRINT
 %token texto
 %token<node> TEXT_C
@@ -53,11 +55,10 @@
 %start program
 
 %%
-program 	: statement{
-			printf("%s", strcat("#include <stdio.h>\n int main(void)",$1->string));
-			};
+program 	: statement {printf("%s",strcatN(4,"#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <ctype.h>\n",
+	"int main(void){\n\t",$1->string,"\n}\n"));};
 statement 	: MAIN PRINT_F END{ 
-			$$ = newNode(TYPE_TEXT, strcatN(3, "{\n",$2->string,"}"));
+						$$ = newNode(TYPE_TEXT, strcatN(5,"printf(\"%s","\\n","\",", $2->string, ");"));
 			}
 			| MAIN END{
 			$$ = newNode(TYPE_TEXT, ";");
@@ -76,8 +77,8 @@ TERM		: TEXT_C {$$ = newNode(TYPE_TEXT, $1->string);};
 int main(){
 
   yyparse();
-  printf("No Errors!!\n");
-  return 0;
+  // printf("No Errors!!\n");
+  // return 0;
 }		
 
 char* strcatN(int num, ...)
