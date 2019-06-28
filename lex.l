@@ -1,75 +1,58 @@
 %{
 
+#include "node.h"
 #include <stdio.h>
-#include <string.h>
-#include "sintaxis.tab.h"
-void extern yyerror(char*);
-void invalidToken();
+#include <stdlib.h>
+#include "y.tab.h"
+
+#define TYPE_NOTFOUND 0
+#define TYPE_NUMBER 1
+#define TYPE_TEXT 2
+
+extern void yyerror(const char * msg);
+
+
+
+int linenum = 1;
+int open_parentheses = 0;
+int open_braces = 0;
 
 %}
+
+%x comment
 
 caracter		[a-zA-z]
 digito			[0-9]
 texto			{caracter}({caracter}|digito)*
 numero			{digito}+
 linea			\n
+espacio      	[ \t\r\v\f]
 
 %%
-"es"			{return EQUALS;}
-"no es"			{return NOT;}
-"es igual a"		{return EQUALSCMP;}
-"es distinto"		{return NTEQUAL; }
-"es mayor a"	 	{return GT;}
-"es menor a"		{return LT;}
-"es mayor o igual a"	{return GET;}
-"es menor o igual a"	{return LET;}
-"y"			{return AND;}
-"o"			{return OR;}
-"+"			{return PLUS;}
-"-"			{return MINUS;}
-"*"			{return MULT;}
-"/"			{return DIV;}
-"%"			{return MOD;}
-"si"			{return IF;}
-"sino"			{return ELSE;}
-"mientras"		{return WHILE;}
-"hacer"			{return DO;}
-"falso"			{return FALSE;}
-"verdadero"		{return TRUE;}
-"texto"			{return STRING_T;}
-"numero"		{return INT_T;}
-"imprimir"		{return PRINT;}
-"."			{return END_LINE;}	
-"("			{return L_PAR;}
-")"			{return R_PAR;}
-
-{numero} 		{yylval.node = strtol(yytext, NULL, 10);
-					return INT;}
-
-{texto}			{char * texto = malloc(strlen(yytext)+1);
-				strcpy(texto, yytext);
-				yylval.node = texto;
-				return ID;
-			}
+"inicio"		{return MAIN;}
+"fin"		{return END;}
+"imprimir"		{return print;}
 
 
+{texto}		{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
+									strcpy(str, yytext);
+									yylval.node = newNode(TYPE_TEXT,str);
+									printf("%s", str); 
+									return TEXT_T;}
+{numero}						{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
+									strcpy(str, yytext);
+									yylval.node = newNode(TYPE_NUMBER,str); 
+									return NUMBER_T;}
+{espacio}						{;}
+
+
+\"(\\.|[^"\\])*\"				{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
+									strcpy(str, yytext);
+									yylval.node = newNode(TYPE_TEXT,str); return TEXT_C;}
 %%		
 
 //when the end of input file is read. Return 1 to signal end of input
 int yywrap(void){
 	return 1;
 }
-
-//invalid token or secual is encounter
-void yyerror(char *s){
-	fprintf(stderr, "\nERROR ON line\n");
-	exit(0);
-}
-
-//in case the token doesnt envoke yyerror
-void invalidToken(){
-	printf("\nERROR ON line  : \n Invalid Token \n");
-	exit(0);
-}
-
 

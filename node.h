@@ -1,13 +1,10 @@
+
 #ifndef NODE_H
 #define NODE_H
 
 typedef struct Node {
-	struct Node **child;
-	char* token;
+	int type;
 	char* string;
-	int index;
-	
-	
 }Node;
 
 
