@@ -19,15 +19,33 @@ int open_braces = 0;
 
 %}
 
+%x comment
+
 caracter		[a-zA-z]
 digito			[0-9]
 texto			{caracter}({caracter}|digito)*
 numero			{digito}+
 linea			\n
+espacio      	[ \t\r\v\f]
+
 
 %%
 "inicio"		{return MAIN;}
 "fin"		{return END;}
+"imprimir"		{return print;}
+
+
+{texto}		{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
+									strcpy(str, yytext);
+									yylval.node = newNode(TYPE_TEXT,str);
+									printf("%s", str); 
+									return TEXT_T;}
+{numero}						{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
+									strcpy(str, yytext);
+									yylval.node = newNode(TYPE_NUMBER,str); 
+									return NUMBER_T;}
+{espacio}						{;}
+
 
 \"(\\.|[^"\\])*\"				{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));
 									strcpy(str, yytext);

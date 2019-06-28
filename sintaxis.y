@@ -31,18 +31,22 @@
 	Node *node;
 }
 
+// Finales
+%token print
+%token texto
 
+// Finales variables ?
 %token<node> NUMBER_T
 %token<node> TEXT_T
 %token<node> MAIN
 %token<node> END
-%token PRINT
-%token texto
 %token<node> TEXT_C
-%type<node> program
-%type<node> statement
-%type<node> PRINT_F
+
+//No finales
+%type<node> PROGRAM
+%type<node> STATEMENT
 %type<node> EXPRESSION
+%type<node> CODE
 %type<node> TERM
 
 
@@ -52,26 +56,24 @@
 %left OR AND NOT 
  
 
-%start program
+%start PROGRAM
 
 %%
-program 	: statement {printf("%s",strcatN(4,"#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <ctype.h>\n",
-	"int main(void){\n\t",$1->string,"\n}\n"));};
-statement 	: MAIN PRINT_F END{ 
-						$$ = newNode(TYPE_TEXT, strcatN(5,"printf(\"%s","\\n","\",", $2->string, ");"));
-			}
-			| MAIN END{
-			$$ = newNode(TYPE_TEXT, ";");
+PROGRAM 	: MAIN CODE END {printf("%s",strcatN(4,"#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <ctype.h>\n",
+	"int main(void){\n\t",$2->string,"\n}\n"));};
+CODE		: STATEMENT {$$ = $1;};
+STATEMENT 	: print TERM {
+				if($2->type == TYPE_TEXT){
+					$$ = newNode(TYPE_TEXT, strcatN(3, "printf(\"%s\",", $2->string , ");\n" ));
+				}else if($2->type == TYPE_NUMBER){
+					$$ = newNode(TYPE_NUMBER, strcatN(3, "printf(\"%d\",", $2->string , ");\n" ));	
+				};
 			};
-
-PRINT_F 	: PRINT EXPRESSION{
-			if($2->type == TYPE_TEXT)
-				$$ = newNode(TYPE_TEXT, strcatN(3, "printf(\"%s\"", $2->string , ");\n" ));
-			};		
+			| {$$ = newNode(TYPE_TEXT, ";");}; //Working
 
 EXPRESSION	: TERM  {$$ = $1;};	
 
-TERM		: TEXT_C {$$ = newNode(TYPE_TEXT, $1->string);};
+TERM		: TEXT_C {$$ = $1;}; | NUMBER_T {$$ = $1;};
 %%
 
 int main(){
