@@ -45,9 +45,11 @@ espacio      	[ \t\r\v\f]
 "es igual a"	{return EQUALS;}
 "es mayor o igual a"			{return GET;}
 "es menor o igual a"			{return LET;}
-"es menor a"				{return LT;}
-"es mayor a"				{return GT;}
-"es distinto a"			{return DIF;}
+"es menor a"					{return LT;}
+"hacer"							{return DO;}
+"mientras"						{return WHILE;}
+"es mayor a"					{return GT;}
+"es distinto a"					{return DIF;}
 "\n" 			{lines++;
 				return END_LINE;}
 
