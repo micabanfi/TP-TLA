@@ -54,7 +54,7 @@
 
 %%
 program 	: statement{
-			printf("%s", strcat("#include <stdio.h>\n int main(void)",$1->string);
+			printf("%s", strcat("#include <stdio.h>\n int main(void)",$1->string));
 			};
 statement 	: MAIN PRINT_F END{ 
 			$$ = newNode(TYPE_TEXT, strcatN(3, "{\n",$2->string,"}"));
@@ -65,7 +65,7 @@ statement 	: MAIN PRINT_F END{
 
 PRINT_F 	: PRINT EXPRESSION{
 			if($2->type == TYPE_TEXT)
-				$$ = newNode(TYPE_TEXT, strcatN(3, "printf(\"%s\"", $2->string , ");\n" );
+				$$ = newNode(TYPE_TEXT, strcatN(3, "printf(\"%s\"", $2->string , ");\n" ));
 			};		
 
 EXPRESSION	: TERM  {$$ = $1;};	
