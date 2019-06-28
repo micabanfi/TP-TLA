@@ -1,0 +1,3 @@
+inicio
+imprimir "aa"
+fin
