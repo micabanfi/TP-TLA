@@ -11,12 +11,7 @@
 
 extern void yyerror(const char * msg);
 
-
-
-int linenum = 1;
-int open_parentheses = 0;
-int open_braces = 0;
-
+int lines = 1;
 %}
 
 %x comment
@@ -39,7 +34,8 @@ espacio      	[ \t\r\v\f]
 "-"				{return MINUS;}
 "*"				{return MULT;}
 "/"				{return DIV;}
-"." 			{return END_LINE;}
+"\n" 			{lines++;
+				return END_LINE;}
 
 
 

@@ -6,22 +6,22 @@
 	#include <stdarg.h>
 	#include <string.h>
 	
-	#define MAX_SYMBOLS 100
-	#define MAX_SYMBOL_LENGTH 100
 	#define TYPE_NOTFOUND 0
 	#define TYPE_NUMBER 1
 	#define TYPE_TEXT 2
+	
 	int yydebug=1; 
 	extern int yylex();
-	extern int linenum;
-	char symbolsTable[MAX_SYMBOL_LENGTH][MAX_SYMBOLS];
-	int symbols = 0, symbolsType[MAX_SYMBOLS];
+	extern int lines;
+	
+	char symbolsTable[100][100];
+	int countSymbols = 0, symbolsType[10000];
 	void yyerror(const char * s);
 	char* strcatN(int num, ...);
-	void insertSymbol(char * symbol, int symbolType);
+	void newSymbol(char * symbol, int symbolType);
 	int getType(char * symbol);
 	void checkType(int t1, int t2);
-
+	void repeteadVariable(char * currentSymbol);
 %}
 
 // %define parse.lac full
@@ -90,7 +90,7 @@ STATEMENT 	: print EXPRESSION {
 					$$ = newNode(TYPE_NUMBER, strcatN(3, "printf(\"%d\",", $2->string , ");\n" ));	
 				}
 				}
-			| {$$ = newNode(TYPE_TEXT, ";");} //Working
+			| {$$ = newNode(TYPE_TEXT, "");} //Working
 			| DECLARATION {$$ = newNode(TYPE_TEXT, $1->string);}
 			| ASSIGNMENT {$$ = newNode(TYPE_TEXT, $1->string);}
 			| DEFINITION {$$ = newNode(TYPE_TEXT, $1->string);};
@@ -155,8 +155,10 @@ int main(){
   // return 0;
 }		
 
-char* strcatN(int num, ...)
-{
+char* strcatN(int num, ...){
+	if(num<=1){
+		return NULL;
+	}
 	int i, length;
 	char* toAdd;
 	char* ret;
@@ -181,31 +183,32 @@ char* strcatN(int num, ...)
 	return ret;
 }
 
-int getType(char * symbol) 
-{
-	int index;
-	for(index = 0; index < symbols; index++) {
-		if(strcmp(symbol, symbolsTable[index]) == 0) {
-			return symbolsType[index];
+int getType(char * currentSymbol) {
+	for(int i = 0; i < countSymbols; i++) {
+		if(strcmp(currentSymbol, symbolsTable[i]) == 0) {
+			return symbolsType[i];
 		}
 	}
 
 	return TYPE_NOTFOUND;
 }
 
-void insertSymbol(char * symbol, int symbolType)
-{
-	int index;
- 	for(index = 0; index < symbols; index++) {
-		if(strcmp(symbol, symbolsTable[index]) == 0) {
-			if(symbolsType[index] == symbolType)
-				yyerror("Redeclaration of variable");
-			else
-				yyerror("Multiple Declaration of Variable");
-		}
-	}
+void newSymbol(char * currentSymbol, int currentSymbolType){
 
-	symbolsType[symbols] = symbolType;
-	strcpy(symbolsTable[symbols], symbol);
-	symbols++;
+	if(getType(currentSymbol)!=TYPE_NOTFOUND){
+		repeteadVariable(currentSymbol);
+		return;
+	}
+		
+	//new symbol
+	symbolsType[countSymbols] = currentSymbolType;
+	strcpy(symbolsTable[countSymbols], currentSymbol);
+	countSymbols++;
+}
+
+void repeteadVariable(char * currentSymbol){
+	char line[10];
+	sprintf(line, "%d", lines);
+	char* ret = strcatN(4,"Redefincion de variable ",currentSymbol," en la linea ", line);
+	yyerror(ret);
 }
