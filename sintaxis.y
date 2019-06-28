@@ -76,7 +76,7 @@
 %%
 PROGRAM 	: MAIN CODE END {printf("%s",strcatN(4,"#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <ctype.h>\n",
 							"int main(void){\n\t",$2->string,"\n}\n"));}
-			| MAIN END { printf("%s","int main(void);"); };
+			| MAIN END { printf("%s","int main(void){}"); };
 
 CODE		: STATEMENT {$$ = $1;}
 			| STATEMENT CODE {$$ = $1;};
