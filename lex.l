@@ -60,8 +60,9 @@ espacio      	[ \t\r\v\f]
 "es distinto a"					{return DIF;}
 "\n" 			{lines++;
 				return END_LINE;}
-
-
+"COUNTER_VARIABLE_DEFINE" {return ERROR;}
+"CONST_VARIABLE_DEFINE" {return ERROR;}
+"escribir en" {return WRITE;}
 
 
 {numero}						{	char * str = (char*)malloc(strlen(yytext) * sizeof(char));

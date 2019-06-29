@@ -59,6 +59,8 @@
 %token OP
 %token CP
 %token FROM
+%token ERROR
+%token WRITE
 
 // Finales variables ?
 %token<node> NUMBER_T
@@ -101,8 +103,9 @@
 %start PROGRAM
 
 %%
-PROGRAM 	: MAIN CODE END {printf("%s",strcatN(4,"#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <ctype.h>\n",
-							"int main(void){\n\t",$2->string,"\n}\n"));}
+PROGRAM 	: MAIN CODE END {printf("%s",strcatN(5,"#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <ctype.h>\n",
+							"char* concat(const char *s1, const char *s2){char *result = malloc(strlen(s1) + strlen(s2) + 1);strcpy(result, s1);strcat(result, s2);return result;}",
+							"\n\nint main(void){\n\t",$2->string,"\n}\n"));}
 			| MAIN END { printf("%s","int main(void){}"); };
 
 CODE		: STATEMENT {$$ = newNode(TYPE_TEXT, strcatN(2, $1->string, ""));}
@@ -115,6 +118,18 @@ STATEMENT 	: print EXPRESSION END_LINE {
 					$$ = newNode(TYPE_NUMBER, strcatN(3, "printf(\"%d\\n\",", $2->string , ");\n" ));	
 				}
 			}
+			| WRITE ID END_LINE {$$ = newNode(TYPE_TEXT, strcatN(
+									11,
+									"char CONST_VARIABLE_DEFINE=0;\n int COUNTER_VARIABLE_DEFINE=0;\n",
+									$2->string,
+									"=calloc(100,1);\n while((CONST_VARIABLE_DEFINE=getchar())!='\\n'){\n if(COUNTER_VARIABLE_DEFINE!=0 && COUNTER_VARIABLE_DEFINE%100 == 0)\n ",
+									$2->string,
+									"= realloc(",$2->string,",(COUNTER_VARIABLE_DEFINE/100+2)*100);\n ",
+									$2->string,
+									"[COUNTER_VARIABLE_DEFINE++]=CONST_VARIABLE_DEFINE;}\n",
+									$2->string,
+									"[COUNTER_VARIABLE_DEFINE] = '\\0';\n"))
+								;} 
 			| END_LINE {$$ = newNode(TYPE_TEXT, "\n");} //Working
 			| DECLARATION END_LINE {$$ = newNode(TYPE_TEXT, $1->string);}
 			| ASSIGNMENT END_LINE {$$ = newNode(TYPE_TEXT, $1->string);}
@@ -179,7 +194,7 @@ EXPRESSION	: TERM  {$$ = $1;}
 									sameType($1->type, $3->type);
 									 if($1->type == TYPE_TEXT)
 									{
-										$$ = newNode(TYPE_TEXT, strcatN(5,"strcat(",$1->string,",",$3->string,")"));
+										$$ = newNode(TYPE_TEXT, strcatN(5,"concat(",$1->string,",",$3->string,")"));
 									}
 									else
 										$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")+(",$3->string,")"));

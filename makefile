@@ -1,20 +1,27 @@
 GCC=gcc
-GCCFLAGS= -Wall -pedantic -g
+GCCFLAGS= -Wall -pedantic 
 
-all: clean compiler 
+all: clean compiler test1 test2 test3
 
 
 compiler: 
-		yacc -d sintaxis.y -t -v
+		yacc -d sintaxis.y 
 		flex lex.l
 		$(GCC) -o compiler lex.yy.c y.tab.c node.c node.h -ly $(GCCFLAGS)
 
 clean: 
-	rm -rf *.o y.tab.c y.tab.h compiler lex.yy.c ejemplo1.c
+	rm -rf *.o y.tab.c y.tab.h compiler lex.yy.c test* *.out
 
 test1: 
-	./compiler < ejemplo1.m > ejemplo1.c
-	gcc ejemplo1.c -o ejemplo1
+	./compiler <ejemplo1.m> test1.c
+	gcc test1.c -o test1
 
+test2: 
+	./compiler <ejemplo2.m> test2.c
+	gcc test2.c -o test2
 
-.PHONY: all test1 clean compiler
+test3: 
+	./compiler <ejemplo3.m> test3.c
+	gcc test3.c -o test3
+
+.PHONY: all test1 test2 test3 clean compiler
