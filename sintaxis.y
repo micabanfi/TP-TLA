@@ -172,6 +172,7 @@ CONDITIONAL : EXPRESSION EQUALS EXPRESSION 	{sameType($1->type,$3->type);
 			| OP CONDITIONAL AND CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " && ", $4->string, ")"));};
 
 EXPRESSION	: TERM  {$$ = $1;}
+	
 			|EXPRESSION PLUS EXPRESSION{
 									sameType($1->type, $3->type);
 									 if($1->type == TYPE_TEXT)
