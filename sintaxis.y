@@ -314,7 +314,7 @@ void repeteadVariable(char * currentSymbol){
 
 void errorType(){
 	char line[10];
-	sprintf(line, "%d", lines-1);
+	sprintf(line, "%d", lines);
 	char* ret = strcatN(2,"Ls tipos no coinciden en la linea ", line);
 	yyerror(ret);
 	exit(1);
