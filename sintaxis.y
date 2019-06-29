@@ -128,18 +128,42 @@ CONDITIONAL : NUM_C EQUALS NUM_C 	{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->s
 			| NUM_C LET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
 			| OP CONDITIONAL OR CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " || ", $4->string, ")"));};
 			| OP CONDITIONAL AND CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " && ", $4->string, ")"));};
-			| ID EQUALS NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
-			| ID DIF NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
-			| ID GT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
-			| ID GET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
-			| ID LT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
-			| ID LET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
-			| ID EQUALS ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
-			| ID DIF ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
-			| ID GT ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
-			| ID GET ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
-			| ID LT ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
-			| ID LET ID 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
+			| ID EQUALS NUM_C 		{sameType(getType($1->string),TYPE_NUMBER);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
+			| ID DIF NUM_C 			{sameType(getType($1->string),TYPE_NUMBER);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
+			| ID GT NUM_C 			{sameType(getType($1->string),TYPE_NUMBER);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
+			| ID GET NUM_C 			{sameType(getType($1->string),TYPE_NUMBER);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
+			| ID LT NUM_C 			{sameType(getType($1->string),TYPE_NUMBER);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
+			| ID LET NUM_C 			{sameType(getType($1->string),TYPE_NUMBER);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
+			| ID EQUALS TEXT_C 		{sameType(getType($1->string),TYPE_TEXT);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
+			| ID DIF TEXT_C 		{sameType(getType($1->string),TYPE_TEXT);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
+			| ID GT TEXT_C 			{sameType(getType($1->string),TYPE_TEXT);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
+			| ID GET TEXT_C 		{sameType(getType($1->string),TYPE_TEXT);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
+			| ID LT TEXT_C 			{sameType(getType($1->string),TYPE_TEXT);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
+			| ID LET TEXT_C 		{sameType(getType($1->string),TYPE_TEXT);
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
+			| ID EQUALS ID			{sameType(getType($1->string),getType($3->string));
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
+			| ID DIF ID 			{sameType(getType($1->string),getType($3->string));
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
+			| ID GT ID 				{sameType(getType($1->string),getType($3->string));
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
+			| ID GET ID 			{sameType(getType($1->string),getType($3->string));
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
+			| ID LT ID 				{sameType(getType($1->string),getType($3->string));
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
+			| ID LET ID 			{sameType(getType($1->string),getType($3->string));
+									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
 
 EXPRESSION	: TERM  {$$ = $1;}
 			|EXPRESSION PLUS EXPRESSION{
@@ -186,7 +210,7 @@ TERM		: TEXT_C {$$ = newNode(TYPE_TEXT, $1->string);}
 
 DECLARATION : NUMBER_T ID {	
 				newSymbol($2->string,TYPE_NUMBER);
-				$$ = newNode(TYPE_TEXT,strcatN(3,"int ",$2->string,";")); }
+				$$ = newNode(TYPE_NUMBER,strcatN(3,"int ",$2->string,";")); }
 			| TEXT_T ID {	
 				newSymbol($2->string,TYPE_TEXT);
 				$$ = newNode(TYPE_TEXT,strcatN(3,"char * ",$2->string,";")); };
@@ -251,7 +275,7 @@ int getType(char * currentSymbol) {
 void sameType(int s1,int s2){
 	if(s1!=s2)
 		errorType();
-}
+	}
 
 void newSymbol(char * currentSymbol, int currentSymbolType){
 
@@ -259,11 +283,11 @@ void newSymbol(char * currentSymbol, int currentSymbolType){
 		repeteadVariable(currentSymbol);
 		return;
 	}
-		
 	//new symbol
 	symbolsType[countSymbols] = currentSymbolType;
 	strcpy(symbolsTable[countSymbols], currentSymbol);
 	countSymbols++;
+
 }
 
 void repeteadVariable(char * currentSymbol){
@@ -276,6 +300,6 @@ void repeteadVariable(char * currentSymbol){
 void errorType(){
 	char line[10];
 	sprintf(line, "%d", lines-1);
-	char* ret = strcatN(2,"Tipos no coinciden en la linea ", line);
+	char* ret = strcatN(2,"Ls tipos no coinciden en la linea ", line);
 	yyerror(ret);
 }
