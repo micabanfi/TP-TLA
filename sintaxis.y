@@ -120,7 +120,7 @@ STATEMENT 	: print EXPRESSION END_LINE {
 			| DO END_LINE CODE WHILE CONDITIONAL END_LINE{$$ = newNode(TYPE_TEXT, strcatN(5, "do {\n",$3->string, "} while (", $5->string ,");\n"));};
 
 ELIF        : OR IF CONDITIONAL END_LINE CODE ENDIF END_LINE {$$ = newNode(TYPE_TEXT, strcatN(5, " else if ", $3->string, "{\n", $5->string ,"\n}\n"));}
-			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $5->string));}
+			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $6->string));}
 			| ELSE END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(3, " else {", $3->string, "}\n"));};
 			
 CONDITIONAL : EXPRESSION EQUALS EXPRESSION 	{sameType($1->type,$3->type);
@@ -165,9 +165,10 @@ CONDITIONAL : EXPRESSION EQUALS EXPRESSION 	{sameType($1->type,$3->type);
 
 EXPRESSION	: TERM  {$$ = $1;}
 			|EXPRESSION PLUS EXPRESSION{
+									sameType($1->type, $3->type);
 									 if($1->type == TYPE_TEXT)
 									{
-										$$ = newNode(TYPE_TEXT, strcatN(5,"strcatP(",$1->string,",",$3->string,")"));
+										$$ = newNode(TYPE_TEXT, strcatN(5,"strcat(",$1->string,",",$3->string,")"));
 									}
 									else
 										$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")+(",$3->string,")"));
@@ -175,6 +176,7 @@ EXPRESSION	: TERM  {$$ = $1;}
 			| EXPRESSION MINUS EXPRESSION {
 									if($1->type == TYPE_TEXT || $3->type == TYPE_TEXT){
 										yyerror("Operacion Invalida - se requieren operandos del tipo numero.");
+										exit(1);
 									}
 									else{
 										$$ = newNode(TYPE_NUMBER,strcatN(5,"(",$1->string,")-(",$3->string,")"));
@@ -183,6 +185,7 @@ EXPRESSION	: TERM  {$$ = $1;}
 			|EXPRESSION MUL EXPRESSION {
 									if($1->type == TYPE_TEXT || $3->type == TYPE_TEXT){
 										yyerror("Operacion Invalida - se requieren operandos del tipo numero.");
+										exit(1);
 									}
 									else{
 										$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")*(",$3->string,")"));
@@ -191,10 +194,12 @@ EXPRESSION	: TERM  {$$ = $1;}
 			|EXPRESSION DIV EXPRESSION{
 								if($1->type == TYPE_TEXT || $3->type == TYPE_TEXT){
 										yyerror("Operacion Invalida - se requieren operandos del tipo numero.");
+										exit(1);
 									}
 									else{								
 										if($3->string ==0 ){
 											yyerror("Recuerde que no puede dividir por cero");
+											exit(1);
 										}
 										else{
 											$$ = newNode(TYPE_NUMBER, strcatN(5,"(",$1->string,")/(",$3->string,")"));
@@ -304,6 +309,7 @@ void repeteadVariable(char * currentSymbol){
 	sprintf(line, "%d", lines-1);
 	char* ret = strcatN(4,"Redefincion de variable ",currentSymbol," en la linea ", line);
 	yyerror(ret);
+	exit(1);
 }
 
 void errorType(){
@@ -311,6 +317,7 @@ void errorType(){
 	sprintf(line, "%d", lines-1);
 	char* ret = strcatN(2,"Ls tipos no coinciden en la linea ", line);
 	yyerror(ret);
+	exit(1);
 }
 
 void wrongPlaceDefinition(){
@@ -318,4 +325,5 @@ void wrongPlaceDefinition(){
 	sprintf(line, "%d", lines-1);
 	char* ret = strcatN(2,"Las variables deben ser definidas al inicio. Definicion erronea en la linea ", line);
 	yyerror(ret);
+	exit(1);
 }
