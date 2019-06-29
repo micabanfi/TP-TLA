@@ -21,7 +21,6 @@
 	char* strcatN(int num, ...);
 	void newSymbol(char * symbol, int symbolType);
 	int getType(char * symbol);
-	void checkType(int t1, int t2);
 	void repeteadVariable(char * currentSymbol);
 	void errorType();
 	void sameType(int s1,int s2);
@@ -59,6 +58,7 @@
 %token DIV
 %token OP
 %token CP
+%token FROM
 
 // Finales variables ?
 %token<node> NUMBER_T
@@ -122,10 +122,12 @@ STATEMENT 	: print EXPRESSION END_LINE {
 			| IF CONDITIONAL END_LINE CODE ELIF{$$ = newNode(TYPE_TEXT, strcatN(6, "if (",$2->string, "){\n", $4->string ,"\n}", $5->string));}
 			| IF CONDITIONAL END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(5, "if (",$2->string, "){\n", $4->string ,"\n}\n"));}
 			| DO END_LINE CODE WHILE CONDITIONAL END_LINE{$$ = newNode(TYPE_TEXT, strcatN(5, "do {\n",$3->string, "} while (", $5->string ,");\n"));};
-			| FOR NUM_C TO NUM_C STEP NUM_C END_LINE CODE ENDFOR END_LINE {
-				$$ = newNode(TYPE_TEXT, strcatN(9, "for (int repetir = ", $2->string, "; repetir <= ", $4->string,"; repetir += ", $6->string,"){\n", $8->string, "}\n"));}
-			| FOR NUM_C TO NUM_C END_LINE CODE ENDFOR END_LINE {
-				$$ = newNode(TYPE_TEXT, strcatN(7, "for (int repetir = ", $2->string, "; repetir <= ", $4->string,"; repetir += 1){\n", $6->string, "}\n"));}
+			| FOR ID FROM NUM_C TO NUM_C STEP NUM_C END_LINE CODE ENDFOR END_LINE {
+				sameType(TYPE_NUMBER,getType($2->string));
+				$$ = newNode(TYPE_TEXT, strcatN(15, "for(", $2->string," = ", $4->string,";",$2->string,"<=", $6->string,";",$2->string,"+=", $8->string,"){\n", $10->string, "}\n"));}
+			| FOR ID FROM NUM_C TO NUM_C END_LINE CODE ENDFOR END_LINE {
+				sameType(TYPE_NUMBER,getType($2->string));
+				$$ = newNode(TYPE_TEXT, strcatN(13, "for(", $2->string," = ", $4->string,";",$2->string,"<=", $6->string,";",$2->string,"++){\n", $8->string, "}\n"));}
 
 ELIF        : OR IF CONDITIONAL END_LINE CODE ENDIF END_LINE {$$ = newNode(TYPE_TEXT, strcatN(5, " else if ", $3->string, "{\n", $5->string ,"\n}\n"));}
 			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $6->string));}
@@ -297,7 +299,7 @@ void posibleDefinition(){
 void sameType(int s1,int s2){
 	if(s1!=s2)
 		errorType();
-	}
+}
 
 void newSymbol(char * currentSymbol, int currentSymbolType){
 
@@ -323,7 +325,7 @@ void repeteadVariable(char * currentSymbol){
 void errorType(){
 	char line[10];
 	sprintf(line, "%d", lines);
-	char* ret = strcatN(2,"Ls tipos no coinciden en la linea ", line);
+	char* ret = strcatN(2,"Los tipos no coinciden en la linea ", line);
 	yyerror(ret);
 	exit(1);
 }

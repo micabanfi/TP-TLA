@@ -47,8 +47,9 @@ espacio      	[ \t\r\v\f]
 "es mayor o igual a"			{return GET;}
 "es menor o igual a"			{return LET;}
 "es menor a"					{return LT;}
-"repetir desde"					{return FOR;}
-"fin repetir"					{return ENDFOR;}
+"para"							{return FOR;}
+"desde"							{return FROM;}
+"fin ciclo"					{return ENDFOR;}
 "hasta"							{return TO;}
 "de a"							{return STEP;}
 "hacer"							{variableDefinition=1;
