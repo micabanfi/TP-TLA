@@ -14,7 +14,7 @@
 	int yydebug=1; 
 	extern int yylex();
 	extern int lines;
-	
+	extern int variableDefinition;
 	char symbolsTable[100][100];
 	int countSymbols = 0, symbolsType[10000];
 	void yyerror(const char * s);
@@ -25,6 +25,9 @@
 	void repeteadVariable(char * currentSymbol);
 	void errorType();
 	void sameType(int s1,int s2);
+	void posibleDefinition();
+	void wrongPlaceDefinition();
+
 %}
 
 // %define parse.lac full
@@ -107,7 +110,7 @@ STATEMENT 	: print EXPRESSION END_LINE {
 				}else if($2->type == TYPE_NUMBER){
 					$$ = newNode(TYPE_NUMBER, strcatN(3, "printf(\"%d\",", $2->string , ");\n" ));	
 				}
-				}
+			}
 			| END_LINE {$$ = newNode(TYPE_TEXT, "\n");} //Working
 			| DECLARATION END_LINE {$$ = newNode(TYPE_TEXT, $1->string);}
 			| ASSIGNMENT END_LINE {$$ = newNode(TYPE_TEXT, $1->string);}
@@ -204,9 +207,11 @@ TERM		: TEXT_C {$$ = newNode(TYPE_TEXT, $1->string);}
 			| ID {$$ = newNode(getType($1->string),$1->string);};
 
 DECLARATION : NUMBER_T ID {	
+				posibleDefinition();
 				newSymbol($2->string,TYPE_NUMBER);
 				$$ = newNode(TYPE_NUMBER,strcatN(3,"int ",$2->string,";\n")); }
 			| TEXT_T ID {	
+				posibleDefinition();
 				newSymbol($2->string,TYPE_TEXT);
 				$$ = newNode(TYPE_TEXT,strcatN(3,"char * ",$2->string,";\n")); };
 
@@ -215,10 +220,12 @@ ASSIGNMENT	: ID EQUALS EXPRESSION {
 				$$ = newNode($3->type,strcatN(4,$1->string,"=",$3->string,";\n"));};
 
 DEFINITION	: NUMBER_T ID EQUALS EXPRESSION { 
+				posibleDefinition();
 				newSymbol($2->string,TYPE_NUMBER);
 				sameType(TYPE_NUMBER,$4->type);
 				$$ = newNode(TYPE_TEXT,strcatN(5,"int ",$2->string,"=",$4->string,";\n")); }
 			| TEXT_T ID EQUALS EXPRESSION { 
+				posibleDefinition();
 				newSymbol($2->string,TYPE_TEXT);
 				sameType(TYPE_TEXT,$4->type);
 				$$ = newNode(TYPE_TEXT,strcatN(5,"char * ",$2->string,"=",$4->string,";\n")); };
@@ -268,6 +275,12 @@ int getType(char * currentSymbol) {
 	return TYPE_NOTFOUND;
 }
 
+void posibleDefinition(){
+	if(variableDefinition!=0){
+		wrongPlaceDefinition();
+	}
+}
+
 void sameType(int s1,int s2){
 	if(s1!=s2)
 		errorType();
@@ -297,5 +310,12 @@ void errorType(){
 	char line[10];
 	sprintf(line, "%d", lines-1);
 	char* ret = strcatN(2,"Ls tipos no coinciden en la linea ", line);
+	yyerror(ret);
+}
+
+void wrongPlaceDefinition(){
+	char line[10];
+	sprintf(line, "%d", lines-1);
+	char* ret = strcatN(2,"Las variables deben ser definidas al inicio. Definicion erronea en la linea ", line);
 	yyerror(ret);
 }

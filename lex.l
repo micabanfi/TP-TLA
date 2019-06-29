@@ -11,7 +11,7 @@
 #define TYPE_BOOL 3
 
 extern void yyerror(const char * msg);
-
+int variableDefinition=0;
 int lines = 1;
 %}
 
@@ -29,7 +29,8 @@ espacio      	[ \t\r\v\f]
 "fin"			{return END;}
 "imprimir"		{return print;}
 "es"			{return EQUALS;}
-"si"			{return IF;}
+"si"			{variableDefinition=1;
+				return IF;}
 "fin si"		{return ENDIF;}
 "y"				{return AND;}
 "y si no"		{return ELSE;}
@@ -46,8 +47,10 @@ espacio      	[ \t\r\v\f]
 "es mayor o igual a"			{return GET;}
 "es menor o igual a"			{return LET;}
 "es menor a"					{return LT;}
-"hacer"							{return DO;}
-"mientras"						{return WHILE;}
+"hacer"							{variableDefinition=1;
+								return DO;}
+"mientras"						{variableDefinition=1;
+								return WHILE;}
 "es mayor a"					{return GT;}
 "es distinto a"					{return DIF;}
 "\n" 			{lines++;
