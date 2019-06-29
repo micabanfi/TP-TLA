@@ -1,4 +1,4 @@
-GCC=gcc-7
+GCC=gcc
 GCCFLAGS= -Wall -pedantic -g
 
 all: clean compiler 
