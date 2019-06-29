@@ -315,7 +315,7 @@ void newSymbol(char * currentSymbol, int currentSymbolType){
 void repeteadVariable(char * currentSymbol){
 	char line[10];
 	sprintf(line, "%d", lines-1);
-	char* ret = strcatN(4,"Redefincion de variable ",currentSymbol," en la linea ", line);
+	char* ret = strcatN(4,"Redefinicion de variable ",currentSymbol," en la linea ", line);
 	yyerror(ret);
 	exit(1);
 }
@@ -323,7 +323,7 @@ void repeteadVariable(char * currentSymbol){
 void errorType(){
 	char line[10];
 	sprintf(line, "%d", lines);
-	char* ret = strcatN(2,"Ls tipos no coinciden en la linea ", line);
+	char* ret = strcatN(2,"Los tipos no coinciden en la linea ", line);
 	yyerror(ret);
 	exit(1);
 }
