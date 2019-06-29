@@ -111,60 +111,54 @@ STATEMENT 	: print EXPRESSION END_LINE {
 			| END_LINE {$$ = newNode(TYPE_TEXT, "\n");} //Working
 			| DECLARATION END_LINE {$$ = newNode(TYPE_TEXT, $1->string);}
 			| ASSIGNMENT END_LINE {$$ = newNode(TYPE_TEXT, $1->string);}
-			| DEFINITION END_LINE {$$ = newNode(TYPE_TEXT, $1->string);};
-			| IF CONDITIONAL END_LINE CODE ELIF{$$ = newNode(TYPE_TEXT, strcatN(6, "if (",$2->string, "){\n", $4->string ,"\n}", $5->string));};
-			| IF CONDITIONAL END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(5, "if (",$2->string, "){\n", $4->string ,"\n}\n"));};
+			| DEFINITION END_LINE {$$ = newNode(TYPE_TEXT, $1->string);}
+			| IF CONDITIONAL END_LINE CODE ELIF{$$ = newNode(TYPE_TEXT, strcatN(6, "if (",$2->string, "){\n", $4->string ,"\n}", $5->string));}
+			| IF CONDITIONAL END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(5, "if (",$2->string, "){\n", $4->string ,"\n}\n"));}
 			| DO END_LINE CODE WHILE CONDITIONAL END_LINE{$$ = newNode(TYPE_TEXT, strcatN(5, "do {\n",$3->string, "} while (", $5->string ,");\n"));};
 
-ELIF        : OR IF CONDITIONAL END_LINE CODE ENDIF END_LINE {$$ = newNode(TYPE_TEXT, strcatN(5, " else if ", $3->string, "{\n", $5->string ,"\n}\n"));};
-			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $5->string));};
+ELIF        : OR IF CONDITIONAL END_LINE CODE ENDIF END_LINE {$$ = newNode(TYPE_TEXT, strcatN(5, " else if ", $3->string, "{\n", $5->string ,"\n}\n"));}
+			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $5->string));}
 			| ELSE END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(3, " else {", $3->string, "}\n"));};
 			
-CONDITIONAL : NUM_C EQUALS NUM_C 	{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
-			| NUM_C DIF NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
-			| NUM_C GT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
-			| NUM_C GET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
-			| NUM_C LT NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
-			| NUM_C LET NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
-			| OP CONDITIONAL OR CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " || ", $4->string, ")"));};
+CONDITIONAL : EXPRESSION EQUALS EXPRESSION 	{sameType($1->type,$3->type);
+											if($1->type==TYPE_TEXT)
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(strcmp(", $1->string, ",", $3->string, ")==0)"));
+											else	
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));
+											}
+
+			| EXPRESSION DIF EXPRESSION 	{sameType($1->type,$3->type);
+											if($1->type==TYPE_TEXT)
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(strcmp(", $1->string, ",", $3->string, ")!=0)"));
+											else	
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));
+											}
+			| EXPRESSION GT EXPRESSION 		{sameType($1->type,$3->type);
+											if($1->type==TYPE_TEXT)
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(strcmp(", $1->string, ",", $3->string, ")>0)"));
+											else	
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));
+											}	
+			| EXPRESSION GET EXPRESSION 	{sameType($1->type,$3->type);
+											if($1->type==TYPE_TEXT)
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(strcmp(", $1->string, ",", $3->string, ")>=0)"));
+											else	
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));
+											}
+			| EXPRESSION LT EXPRESSION 		{sameType($1->type,$3->type);
+											if($1->type==TYPE_TEXT)
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(strcmp(", $1->string, ",", $3->string, ")<0)"));
+											else	
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, "<", $3->string, ")"));
+											}	
+			| EXPRESSION LET EXPRESSION 	{sameType($1->type,$3->type);
+											if($1->type==TYPE_TEXT)
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(strcmp(", $1->string, ",", $3->string, ")<=0)"));
+											else	
+												$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));
+											}
+			| OP CONDITIONAL OR CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " || ", $4->string, ")"));}
 			| OP CONDITIONAL AND CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " && ", $4->string, ")"));};
-			| ID EQUALS NUM_C 		{sameType(getType($1->string),TYPE_NUMBER);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
-			| ID DIF NUM_C 			{sameType(getType($1->string),TYPE_NUMBER);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
-			| ID GT NUM_C 			{sameType(getType($1->string),TYPE_NUMBER);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
-			| ID GET NUM_C 			{sameType(getType($1->string),TYPE_NUMBER);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
-			| ID LT NUM_C 			{sameType(getType($1->string),TYPE_NUMBER);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
-			| ID LET NUM_C 			{sameType(getType($1->string),TYPE_NUMBER);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
-			| ID EQUALS TEXT_C 		{sameType(getType($1->string),TYPE_TEXT);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
-			| ID DIF TEXT_C 		{sameType(getType($1->string),TYPE_TEXT);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
-			| ID GT TEXT_C 			{sameType(getType($1->string),TYPE_TEXT);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
-			| ID GET TEXT_C 		{sameType(getType($1->string),TYPE_TEXT);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
-			| ID LT TEXT_C 			{sameType(getType($1->string),TYPE_TEXT);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
-			| ID LET TEXT_C 		{sameType(getType($1->string),TYPE_TEXT);
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
-			| ID EQUALS ID			{sameType(getType($1->string),getType($3->string));
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
-			| ID DIF ID 			{sameType(getType($1->string),getType($3->string));
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
-			| ID GT ID 				{sameType(getType($1->string),getType($3->string));
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " > ", $3->string, ")"));};
-			| ID GET ID 			{sameType(getType($1->string),getType($3->string));
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " >= ", $3->string, ")"));};
-			| ID LT ID 				{sameType(getType($1->string),getType($3->string));
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
-			| ID LET ID 			{sameType(getType($1->string),getType($3->string));
-									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
-			
 
 EXPRESSION	: TERM  {$$ = $1;}
 			|EXPRESSION PLUS EXPRESSION{
@@ -211,23 +205,23 @@ TERM		: TEXT_C {$$ = newNode(TYPE_TEXT, $1->string);}
 
 DECLARATION : NUMBER_T ID {	
 				newSymbol($2->string,TYPE_NUMBER);
-				$$ = newNode(TYPE_NUMBER,strcatN(3,"int ",$2->string,";")); }
+				$$ = newNode(TYPE_NUMBER,strcatN(3,"int ",$2->string,";\n")); }
 			| TEXT_T ID {	
 				newSymbol($2->string,TYPE_TEXT);
-				$$ = newNode(TYPE_TEXT,strcatN(3,"char * ",$2->string,";")); };
+				$$ = newNode(TYPE_TEXT,strcatN(3,"char * ",$2->string,";\n")); };
 
 ASSIGNMENT	: ID EQUALS EXPRESSION {
 				sameType(getType($1->string),$3->type);
-				$$ = newNode($3->type,strcatN(4,$1->string,"=",$3->string,";"));};
+				$$ = newNode($3->type,strcatN(4,$1->string,"=",$3->string,";\n"));};
 
 DEFINITION	: NUMBER_T ID EQUALS EXPRESSION { 
 				newSymbol($2->string,TYPE_NUMBER);
 				sameType(TYPE_NUMBER,$4->type);
-				$$ = newNode(TYPE_TEXT,strcatN(5,"int ",$2->string,"=",$4->string,";")); }
+				$$ = newNode(TYPE_TEXT,strcatN(5,"int ",$2->string,"=",$4->string,";\n")); }
 			| TEXT_T ID EQUALS EXPRESSION { 
 				newSymbol($2->string,TYPE_TEXT);
 				sameType(TYPE_TEXT,$4->type);
-				$$ = newNode(TYPE_TEXT,strcatN(5,"char * ",$2->string,"=",$4->string,";")); };
+				$$ = newNode(TYPE_TEXT,strcatN(5,"char * ",$2->string,"=",$4->string,";\n")); };
 
 
 %%

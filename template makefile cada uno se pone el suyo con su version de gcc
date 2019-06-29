@@ -1,7 +1,7 @@
 GCC=gcc
 GCCFLAGS= -Wall -pedantic 
 
-all: clean compiler test1 test2 test3
+all: clean compiler test1 test2 test3 test6
 
 
 compiler: 
@@ -10,7 +10,7 @@ compiler:
 		$(GCC) -o compiler lex.yy.c y.tab.c node.c node.h -ly $(GCCFLAGS)
 
 clean: 
-	rm -rf *.o y.tab.c y.tab.h compiler lex.yy.c test*
+	rm -rf *.o y.tab.c y.tab.h compiler lex.yy.c test* *.out
 
 test1: 
 	./compiler <ejemplo1.m> test1.c
@@ -24,4 +24,8 @@ test3:
 	./compiler <ejemplo3.m> test3.c
 	gcc test3.c -o test3
 
-.PHONY: all test1 test2 test3 clean compiler
+test6: 
+	./compiler <ejemplo6.m> test6.c
+	gcc test6.c -o test6
+
+.PHONY: all test1 test2 test3 test6 clean compiler
