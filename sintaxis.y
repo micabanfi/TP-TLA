@@ -174,6 +174,7 @@ CONDITIONAL : EXPRESSION EQUALS EXPRESSION 	{sameType($1->type,$3->type);
 			| OP CONDITIONAL AND CONDITIONAL CP {$$ = newNode(TYPE_TEXT, strcatN(5, "(", $2->string, " && ", $4->string, ")"));};
 
 EXPRESSION	: TERM  {$$ = $1;}
+	
 			|EXPRESSION PLUS EXPRESSION{
 									sameType($1->type, $3->type);
 									 if($1->type == TYPE_TEXT)
@@ -317,7 +318,7 @@ void newSymbol(char * currentSymbol, int currentSymbolType){
 void repeteadVariable(char * currentSymbol){
 	char line[10];
 	sprintf(line, "%d", lines-1);
-	char* ret = strcatN(4,"Redefincion de variable ",currentSymbol," en la linea ", line);
+	char* ret = strcatN(4,"Redefinicion de variable ",currentSymbol," en la linea ", line);
 	yyerror(ret);
 	exit(1);
 }
