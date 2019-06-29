@@ -47,6 +47,10 @@
 %token GET
 %token LET
 %token LT
+%token FOR
+%token TO
+%token ENDFOR
+%token STEP
 %token GT
 %token DIF
 %token PLUS
@@ -106,9 +110,9 @@ CODE		: STATEMENT {$$ = newNode(TYPE_TEXT, strcatN(2, $1->string, ""));}
 			
 STATEMENT 	: print EXPRESSION END_LINE {
 				if($2->type == TYPE_TEXT){
-					$$ = newNode(TYPE_TEXT, strcatN(3, "printf(\"%s\",", $2->string , ");\n" ));
+					$$ = newNode(TYPE_TEXT, strcatN(3, "printf(\"%s\\n\",", $2->string , ");\n" ));
 				}else if($2->type == TYPE_NUMBER){
-					$$ = newNode(TYPE_NUMBER, strcatN(3, "printf(\"%d\",", $2->string , ");\n" ));	
+					$$ = newNode(TYPE_NUMBER, strcatN(3, "printf(\"%d\\n\",", $2->string , ");\n" ));	
 				}
 			}
 			| END_LINE {$$ = newNode(TYPE_TEXT, "\n");} //Working
@@ -118,10 +122,14 @@ STATEMENT 	: print EXPRESSION END_LINE {
 			| IF CONDITIONAL END_LINE CODE ELIF{$$ = newNode(TYPE_TEXT, strcatN(6, "if (",$2->string, "){\n", $4->string ,"\n}", $5->string));}
 			| IF CONDITIONAL END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(5, "if (",$2->string, "){\n", $4->string ,"\n}\n"));}
 			| DO END_LINE CODE WHILE CONDITIONAL END_LINE{$$ = newNode(TYPE_TEXT, strcatN(5, "do {\n",$3->string, "} while (", $5->string ,");\n"));};
+			| FOR NUM_C TO NUM_C STEP NUM_C END_LINE CODE ENDFOR END_LINE {
+				$$ = newNode(TYPE_TEXT, strcatN(9, "for (int repetir = ", $2->string, "; repetir <= ", $4->string,"; repetir += ", $6->string,"){\n", $8->string, "}\n"));}
+			| FOR NUM_C TO NUM_C END_LINE CODE ENDFOR END_LINE {
+				$$ = newNode(TYPE_TEXT, strcatN(7, "for (int repetir = ", $2->string, "; repetir <= ", $4->string,"; repetir += 1){\n", $6->string, "}\n"));}
 
 ELIF        : OR IF CONDITIONAL END_LINE CODE ENDIF END_LINE {$$ = newNode(TYPE_TEXT, strcatN(5, " else if ", $3->string, "{\n", $5->string ,"\n}\n"));}
 			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $6->string));}
-			| ELSE END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(3, " else {", $3->string, "}\n"));};
+			| ELSE END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(3, " else {\n", $3->string, "}\n"));};
 			
 CONDITIONAL : EXPRESSION EQUALS EXPRESSION 	{sameType($1->type,$3->type);
 											if($1->type==TYPE_TEXT)
