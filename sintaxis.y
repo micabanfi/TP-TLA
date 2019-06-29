@@ -120,7 +120,7 @@ STATEMENT 	: print EXPRESSION END_LINE {
 			| DO END_LINE CODE WHILE CONDITIONAL END_LINE{$$ = newNode(TYPE_TEXT, strcatN(5, "do {\n",$3->string, "} while (", $5->string ,");\n"));};
 
 ELIF        : OR IF CONDITIONAL END_LINE CODE ENDIF END_LINE {$$ = newNode(TYPE_TEXT, strcatN(5, " else if ", $3->string, "{\n", $5->string ,"\n}\n"));}
-			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $5->string));}
+			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $6->string));}
 			| ELSE END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(3, " else {", $3->string, "}\n"));};
 			
 CONDITIONAL : EXPRESSION EQUALS EXPRESSION 	{sameType($1->type,$3->type);
