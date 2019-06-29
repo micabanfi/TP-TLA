@@ -118,7 +118,7 @@ STATEMENT 	: print EXPRESSION END_LINE {
 
 ELIF        : OR IF CONDITIONAL END_LINE CODE ENDIF END_LINE {$$ = newNode(TYPE_TEXT, strcatN(5, " else if ", $3->string, "{\n", $5->string ,"\n}\n"));};
 			| OR IF CONDITIONAL END_LINE CODE ELIF {$$ = newNode(TYPE_TEXT, strcatN(6, " else if ", $3->string, "{\n", $5->string ,"\n}", $5->string));};
-			| ELSE END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(3, " else {", $2->string, "}\n"));};
+			| ELSE END_LINE CODE ENDIF END_LINE{$$ = newNode(TYPE_TEXT, strcatN(3, " else {", $3->string, "}\n"));};
 			
 CONDITIONAL : NUM_C EQUALS NUM_C 	{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " == ", $3->string, ")"));};
 			| NUM_C DIF NUM_C 		{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " != ", $3->string, ")"));};
@@ -164,6 +164,7 @@ CONDITIONAL : NUM_C EQUALS NUM_C 	{$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->s
 									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " < ", $3->string, ")"));};
 			| ID LET ID 			{sameType(getType($1->string),getType($3->string));
 									$$ = newNode(TYPE_TEXT, strcatN(5, "(", $1->string, " <= ", $3->string, ")"));};
+			
 
 EXPRESSION	: TERM  {$$ = $1;}
 			|EXPRESSION PLUS EXPRESSION{
@@ -237,6 +238,7 @@ int main(){
   // printf("No Errors!!\n");
   // return 0;
 }		
+
 
 char* strcatN(int count, ...){
 	if(count<=1){
