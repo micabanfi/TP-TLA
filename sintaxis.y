@@ -118,7 +118,8 @@ STATEMENT 	: print EXPRESSION END_LINE {
 					$$ = newNode(TYPE_NUMBER, strcatN(3, "printf(\"%d\\n\",", $2->string , ");\n" ));	
 				}
 			}
-			| WRITE ID END_LINE {$$ = newNode(TYPE_TEXT, strcatN(
+			| WRITE ID END_LINE {	sameType(TYPE_TEXT,getType($2->string));
+									$$ = newNode(TYPE_TEXT, strcatN(
 									11,
 									"char CONST_VARIABLE_DEFINE=0;\n int COUNTER_VARIABLE_DEFINE=0;\n",
 									$2->string,
