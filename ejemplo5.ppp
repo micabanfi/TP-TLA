@@ -1,0 +1,18 @@
+inicio
+	numero limite
+	numero a es 1
+	numero b es 2
+	numero suma
+	imprimir 0
+	imprimir 1
+	imprimir 1
+	imprimir 2
+	para limite desde 3 hasta 10
+		suma es 0
+		suma es suma + a
+		suma es suma + b
+		imprimir suma
+		a es b
+		b es suma
+	fin ciclo
+fin

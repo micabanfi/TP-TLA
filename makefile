@@ -1,7 +1,7 @@
-GCC=gcc
+GCC=gcc-7
 GCCFLAGS= -Wall -pedantic 
 
-all: clean compiler test1 test2 test3
+all: clean compiler examples
 
 
 compiler: 
@@ -12,16 +12,28 @@ compiler:
 clean: 
 	rm -rf *.o y.tab.c y.tab.h compiler lex.yy.c test* *.out
 
-test1: 
-	./compiler <ejemplo1.m> test1.c
+examples: example1 example2 example3 example4 example5
+
+example1:
+	./compiler <ejemplo1.ppp> test1.c
 	gcc test1.c -o test1
 
-test2: 
-	./compiler <ejemplo2.m> test2.c
+example2:
+	./compiler <ejemplo2.ppp> test2.c
 	gcc test2.c -o test2
 
-test3: 
-	./compiler <ejemplo3.m> test3.c
+example3:
+	./compiler <ejemplo3.ppp> test3.c
 	gcc test3.c -o test3
+
+example4:
+	./compiler <ejemplo4.ppp> test4.c
+	gcc test4.c -o test4
+
+example5:
+	./compiler <ejemplo5.ppp> test5.c
+	gcc test5.c -o test5
+
+
 
 .PHONY: all test1 test2 test3 clean compiler

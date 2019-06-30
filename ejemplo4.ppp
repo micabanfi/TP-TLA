@@ -1,0 +1,7 @@
+inicio
+	numero acum es 0
+	hacer
+		imprimir acum
+		acum es acum + 1
+	mientras acum es menor a 10
+fin
