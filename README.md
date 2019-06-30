@@ -15,7 +15,7 @@ Cada día mas niños comienzan a estudiar programación desde mas jóvenes, y a 
 	>git clone https://github.com/micabanfi/TP-TLA.git
 2. Situarse en la carpeta
 	> cd TP-TLA
-4. Ejecutar makefile
+4. Ejecutar makefile. Es necesario tener verion 7 de gcc
 	> make compiler
 ## Ejecución caso personalizado
 4. Escribir un codigo
