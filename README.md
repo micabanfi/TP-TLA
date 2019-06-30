@@ -28,12 +28,15 @@ Cada día mas niños comienzan a estudiar programación desde mas jóvenes,y  a 
 
 ## Ejecución caso de prueba
 4. Compilar caso de prueba elegido
-	>./compiler <ejemplo1.m> test1.c
-	gcc test1.c -o test1
+	>make example5
 5. Ejecutarlo
 	>./test1
 
+**Se puede compilar todo junto con**
+> make all
 
+**Se puede compilar todos los ejemplos con**
+> make examples
 
 ## Colaboradores
 - Micaela Banfi - mbanfi@itba.edu.ar
