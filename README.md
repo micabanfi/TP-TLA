@@ -28,7 +28,7 @@ Cada día mas niños comienzan a estudiar programación desde mas jóvenes,y  a 
 
 ## Ejecución caso de prueba
 4. Compilar caso de prueba elegido
-	>make example5
+	>make example1
 5. Ejecutarlo
 	>./test1
 
