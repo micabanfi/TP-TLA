@@ -12,7 +12,7 @@
 
 extern void yyerror(const char * msg);
 int variableDefinition=0;
-int lines = 1;
+int lines = 0;
 %}
 
 %x comment
