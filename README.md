@@ -8,14 +8,8 @@ Cada día mas niños comienzan a estudiar programación desde mas jóvenes,y  a 
 - **sintaxis.y** : Definicion de reglas y funciones auxiliares.
 
 ## Estructura
-```mermaid
-graph LR
-C[lex.l] --> B
-A[codigo] --> B{Compilador}
-D[sintaxis.y] --> B
-B --> H[codigo.c]
-H -- gcc  --> K[codigo.o]
-```
+![alt text](https://github.com/micabanfi/TP-TLA/blob/master/diagram?raw=true)
+
 ## Instalación
 1. Clonar repositorio
 	>git clone https://github.com/micabanfi/TP-TLA.git
@@ -34,12 +28,15 @@ H -- gcc  --> K[codigo.o]
 
 ## Ejecución caso de prueba
 4. Compilar caso de prueba elegido
-	>./compiler <ejemplo1.m> test1.c
-	gcc test1.c -o test1
+	>make example5
 5. Ejecutarlo
 	>./test1
 
+**Se puede compilar todo junto con**
+> make all
 
+**Se puede compilar todos los ejemplos con**
+> make examples
 
 ## Colaboradores
 - Micaela Banfi - mbanfi@itba.edu.ar
