@@ -8,14 +8,8 @@ Cada día mas niños comienzan a estudiar programación desde mas jóvenes,y  a 
 - **sintaxis.y** : Definicion de reglas y funciones auxiliares.
 
 ## Estructura
-```mermaid
-graph LR
-C[lex.l] --> B
-A[codigo] --> B{Compilador}
-D[sintaxis.y] --> B
-B --> H[codigo.c]
-H -- gcc  --> K[codigo.o]
-```
+![alt text](https://github.com/micabanfi/TP-TLA/blob/master/diagram?raw=true)
+
 ## Instalación
 1. Clonar repositorio
 	>git clone https://github.com/micabanfi/TP-TLA.git
